@@ -1,0 +1,46 @@
+export const testScenarios=[
+  {
+    "id": "TC01",
+    "description": "Customer A full flow",
+    "cases": [
+      {
+        "action": "upsertCustomer",
+        "data": {
+          "mobile": "9876543210",
+          "email": "abc@gmail.com",
+          "name": "abc"
+        }
+      },
+      {
+        "action": "getCustomer",
+        "data": {
+          "mobile": "9876543210"
+        }
+      },
+      {
+        "action": "validateRedeem",
+        "data": {
+          "customerMobile": "9876543210",
+          "pointsToRedeem": 10,
+          "otpCode": "509293"
+        }
+      },
+      {
+        "action": "blockRedeem",
+        "data": {
+          "customerMobile": "9876543210",
+          "pointsToRedeem": 10,
+          "otpCode": "509293"
+        }
+      },
+      {
+        "action": "pushBill",
+        "data": {
+          "billId": "BILL123",
+          "customerMobile": "9876543210",
+          "billAmount": 1800
+        }
+      }
+    ]
+  }
+]
