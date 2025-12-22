@@ -10,7 +10,7 @@ export const generateBill = async (billData: Bill) => {
     return response.data;
   } catch (err: any) {
     if (err.response) {
-      throw new Error(`generateBill API failed: ${JSON.stringify(err.response.data)}`);
+      throw new Error(`Bill API failed: ${JSON.stringify(err.response.data)}`);
     } else {
       throw new Error(`generateBill API failed: ${err.message}`);
     }
