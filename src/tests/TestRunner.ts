@@ -1,58 +1,72 @@
-// src/tests/TestRunner.ts
-
-import * as customerService from "../apis/customerService";
-import * as loyaltyService from "../apis/loyaltyService";
 import * as billService from "../apis/billService";
-import { testScenarios } from "./data";
+import * as loyaltyService from "../apis/loyaltyService";
+import * as customerService from "../apis/customerService";
 
-async function runTests() {
-  for (const scenario of testScenarios) {
-    console.log(`\nRunning scenario: ${scenario.id} - ${scenario.description}`);
+const testScenarios: any = require("../data/testScenarios.json");
 
-    for (const caseItem of scenario.cases) {
-      const action = caseItem.action;
-      let result = null;
+class TestRunner {
+  async run() {
+    console.log("🚀 Automation Started...");
+    for (const testCase of testScenarios.cases) {
+      console.log(`\n--- Running Case: ${testCase.id} ---`);
 
-      try {
-        switch (action) {
-          case "getCustomer":
-            result = await customerService.getCustomers(caseItem.data.mobile);
-            break;
-
-          case "upsertCustomer":
-            result = await customerService.upsertCustomer(caseItem.data);
-            break;
-
-          case "validateRedeem":
-            result = await loyaltyService.validateRedeem(caseItem.data);
-            break;
-
-          case "blockRedeem":
-            result = await loyaltyService.blockRedeem(caseItem.data);
-            break;
-
-          case "pushBill":
-            result = await billService.pushBill(caseItem.data);
-            break;
-
-          case "setLoyaltyConfig":
-            console.log(" setLoyaltyConfig API not implemented yet");
-            break;
-
-          case "generateBill":
-            console.log(" generateBill API not implemented yet");
-            break;
-
-          default:
-            console.log(`Unknown action: ${action}`);
-        }
-
-        console.log(` ${action} success:`, result);
-      } catch (err: any) {
-        console.log(`${action} failed:`, err.message);
+      for (const post of testCase.post) {
+        await this.executePost(post, testCase.mobile);
       }
+
+      const waitTime = testScenarios.waitAfterPostMinutes || 0.1;
+      console.log(`⏳ Waiting ${waitTime} min...`);
+      await new Promise(res => setTimeout(res, waitTime * 60000));
+
+      await this.verify(testCase);
+    }
+  }
+
+  async executePost(post: any, mobile: string) {
+    switch(post.action) {
+      case "upsertCustomer":
+        await customerService.upsertCustomer(post.data);
+        break;
+
+      case "getCustomer":
+        await customerService.getCustomers(post.data.mobile);
+        break;
+
+      case "validateRedeem":
+        await loyaltyService.validateRedeem(post.data);
+        break;
+
+      case "blockRedeem":
+        await loyaltyService.blockRedeem(post.data);
+        break;
+
+      case "generateBill":
+      case "pushBill":
+        await billService.generateBill({ ...post.data, customerMobile: mobile });
+        break;
+
+      case "setLoyaltyConfig":
+        await loyaltyService.setLoyaltyExclusionConfig(post.configKey);
+        break;
+
+      default:
+        console.log(`⚠️ Unknown action: ${post.action}`);
+    }
+  }
+
+  async verify(testCase: any) {
+    if (!testCase.verify) return;
+
+    const response = await customerService.getCustomers(testCase.mobile);
+    const expected = testCase.verify.expected?.["loyalty.group.points"];
+    const actual = response?.data?.loyalty?.group?.points;
+
+    if (actual === expected) {
+      console.log(`✅ ${testCase.id} PASSED`);
+    } else {
+      console.log(`❌ ${testCase.id} FAILED: Expected ${expected}, Got ${actual}`);
     }
   }
 }
 
-runTests();
+new TestRunner().run().catch(err => console.error(err));

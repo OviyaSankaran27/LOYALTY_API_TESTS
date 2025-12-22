@@ -1,47 +1,30 @@
-[
-  {
-    "id": "TC01",
-    "description": "Customer A full flow",
-    "cases": [
-      {
-        "action": "upsertCustomer",
-        "data": {
-          "mobile": "9876543210",
-          "email": "abc@gmail.com",
-          "name": "abc"
-        }
-      },
-      {
-        "action": "getCustomer",
-        "data": {
-          "mobile": "9876543210"
+{
+  "waitAfterPostMinutes": 0.1,
+  "cases": [
+    {
+      "id": "TC01",
+      "mobile": "9876543210",
+      "post": [
+        {
+          "action": "upsertCustomer",
+          "data": { "mobile": "9876543210", "name": "abc", "email": "abc@gmail.com" }
         },
-        "isSuccessful":true
-      },
-      {
-        "action": "validateRedeem",
-        "data": {
-          "customerMobile": "9876543210",
-          "pointsToRedeem": 10,
-          "otpCode": "509294"
+        {
+          "action": "generateBill",
+          "data": { "billId": "BILL123", "billAmount": 1800 }
+        },
+        {
+          "action": "validateRedeem",
+          "data": { "customerMobile": "9876543210", "pointsToRedeem": 10, "otpCode": "509293" }
+        },
+        {
+          "action": "blockRedeem",
+          "data": { "customerMobile": "9876543210", "pointsToRedeem": 10, "otpCode": "509293" }
         }
-      },
-      {
-        "action": "blockRedeem",
-        "data": {
-          "customerMobile": "9876543210",
-          "pointsToRedeem": 10,
-          "otpCode": "509293"
-        }
-      },
-      {
-        "action": "pushBill",
-        "data": {
-          "billId": "BILL123",
-          "customerMobile": "9876543210",
-          "billAmount": 1800
-        }
+      ],
+      "verify": {
+        "expected": { "loyalty.group.points": 120 }
       }
-    ]
-  }
-]
+    }
+  ]
+}
