@@ -1,72 +1,79 @@
+import testScenarios from "../data/testScenarios.json";
 import * as billService from "../apis/billService";
 import * as loyaltyService from "../apis/loyaltyService";
 import * as customerService from "../apis/customerService";
 
-const testScenarios: any = require("../data/testScenarios.json");
+console.log("🚀 Automation Started...");
 
 class TestRunner {
   async run() {
-    console.log("🚀 Automation Started...");
     for (const testCase of testScenarios.cases) {
       console.log(`\n--- Running Case: ${testCase.id} ---`);
 
-      for (const post of testCase.post) {
-        await this.executePost(post, testCase.mobile);
+      // POST APIs
+      for (const step of testCase.post) {
+        try {
+          switch (step.action) {
+            case "upsertCustomer":
+              await customerService.upsertCustomer(
+                this.replace(step.data, testCase.mobile)
+              );
+              break;
+
+            case "generateBill":
+              await billService.generateBill(
+                this.replace(step.data, testCase.mobile)
+              );
+              break;
+
+            case "validateRedeem":
+              await loyaltyService.validateRedeem(
+                this.replace(step.data, testCase.mobile)
+              );
+              break;
+
+            case "blockRedeem":
+              await loyaltyService.blockRedeem(
+                this.replace(step.data, testCase.mobile)
+              );
+              break;
+          }
+        } catch (err) {
+          console.error("❌ POST Failed:", err);
+        }
+      }
+    }
+
+    // WAIT
+    const waitMs = testScenarios.waitAfterPostMinutes * 60 * 1000;
+    console.log(`⏳ Waiting ${testScenarios.waitAfterPostMinutes} minutes...`);
+    await new Promise(res => setTimeout(res, waitMs));
+
+    // VERIFY
+    for (const testCase of testScenarios.cases) {
+      const response = await customerService.getCustomer(testCase.mobile);
+      const expected = testCase.verify.expected;
+
+      let passed = true;
+      for (const key in expected) {
+        const actual = this.getValue(response, key);
+        if (actual !== expected[key]) {
+          passed = false;
+          console.log(`❌ ${testCase.id} FAILED | ${key}`);
+        }
       }
 
-      const waitTime = testScenarios.waitAfterPostMinutes || 0.1;
-      console.log(`⏳ Waiting ${waitTime} min...`);
-      await new Promise(res => setTimeout(res, waitTime * 60000));
-
-      await this.verify(testCase);
+      if (passed) console.log(`✅ ${testCase.id} PASSED`);
     }
   }
 
-  async executePost(post: any, mobile: string) {
-    switch(post.action) {
-      case "upsertCustomer":
-        await customerService.upsertCustomer(post.data);
-        break;
-
-      case "getCustomer":
-        await customerService.getCustomers(post.data.mobile);
-        break;
-
-      case "validateRedeem":
-        await loyaltyService.validateRedeem(post.data);
-        break;
-
-      case "blockRedeem":
-        await loyaltyService.blockRedeem(post.data);
-        break;
-
-      case "generateBill":
-      case "pushBill":
-        await billService.generateBill({ ...post.data, customerMobile: mobile });
-        break;
-
-      case "setLoyaltyConfig":
-        await loyaltyService.setLoyaltyExclusionConfig(post.configKey);
-        break;
-
-      default:
-        console.log(`⚠️ Unknown action: ${post.action}`);
-    }
+  replace(obj: any, mobile: string) {
+    return JSON.parse(JSON.stringify(obj).replace(/{{mobile}}/g, mobile));
   }
 
-  async verify(testCase: any) {
-    if (!testCase.verify) return;
-
-    const response = await customerService.getCustomers(testCase.mobile);
-    const expected = testCase.verify.expected?.["loyalty.group.points"];
-    const actual = response?.data?.loyalty?.group?.points;
-
-    if (actual === expected) {
-      console.log(`✅ ${testCase.id} PASSED`);
-    } else {
-      console.log(`❌ ${testCase.id} FAILED: Expected ${expected}, Got ${actual}`);
-    }
+  getValue(obj: any, path: string) {
+    return path.split(".").reduce((o, p) => o?.[p], obj);
   }
 }
 
-new TestRunner().run().catch(err => console.error(err));
+new TestRunner().run();

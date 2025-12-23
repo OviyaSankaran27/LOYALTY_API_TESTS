@@ -1,21 +1,14 @@
 import axios from "axios";
 import { BASE_URL, API_KEY } from "../config/env";
-import { Bill } from "../models/BillModel";
 
-export const generateBill = async (billData: Bill) => {
-  try {
-    const response = await axios.post(`${BASE_URL}/bills`, billData, {
-      headers: { 
-        "x-api-key": API_KEY,      // Correct header
-        "Content-Type": "application/json"
-      }
-    });
-    return response.data;
-  } catch (err: any) {
-    if (err.response) {
-      throw new Error(`Bill API failed: ${JSON.stringify(err.response.data)}`);
-    } else {
-      throw new Error(`generateBill API failed: ${err.message}`);
-    }
-  }
+const headers = {
+  "x-api-key": API_KEY,
+  "Content-Type": "application/json"
+};
+
+export const generateBill = async (payload: any) => {
+  const res = await axios.post(`${BASE_URL}/bills`, payload, {
+    headers
+  });
+  return res.data;
 };

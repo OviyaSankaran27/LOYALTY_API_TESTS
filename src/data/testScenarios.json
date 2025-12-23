@@ -7,23 +7,172 @@
       "post": [
         {
           "action": "upsertCustomer",
-          "data": { "mobile": "9876543210", "name": "abc", "email": "abc@gmail.com" }
+          "data": {
+  "name": "abc",
+  "mobile": "{{mobile}}",
+  "email": "abc@gmail.com",
+  "dob": "20/04/2000",
+  "gender": "Female",
+  "address": {
+    "address1": "mumbai",
+    "address2": "",
+    "city": "Tinsukia",
+    "pincode": "400709",
+    "state": "Assam",
+    "country": "India"
+  },
+  "countryCode": "91",
+  "anniversary": "20/04/2020",
+  "externalCustomerId": "12345",
+  "storeCode": "IMP"
+}
         },
         {
           "action": "generateBill",
-          "data": { "billId": "BILL123", "billAmount": 1800 }
+          "data": [
+  {
+    "invoiceType": "IN",
+    "billType": "Retail",
+    "channel": "POS",
+    "billDate": "2025-09-20T12:37:04.967Z",
+    "billLevelOfferDiscount": 30,
+    "billLevelProductDiscount": 100,
+    "billLevelFooterDiscount": 10,
+    "billLevelLoyaltyDiscount": 30,
+    "totalDiscountAmount": 170,
+    "transactionId": "{{billTransactionId}}",
+    "billId": "ID_02_new4",
+    "orderId": "ECOM_ID_01",
+    "shipmentId": "ECOM_SHIPMENT_ID_01",
+    "orderStatus": "INVOICED",
+    "orderStatusCreationDateTime": "2023-11-06T16:15:15",
+    "orderItems": [
+      {
+        "total": 1200,
+        "netAmount": 1110,
+        "quantity": 2,
+        "price": 1200,
+        "IGSTAmt": 0,
+        "CGSTAmt": 101.21,
+        "SGSTAmt": 101.21,
+        "CESSAmt": 0,
+        "CGSTRate": 6,
+        "SGSTRate": 6,
+        "IGSTRate": 0,
+        "CESSRate": 0,
+        "offerCodes": ["PRODUCTOFFER10PER"],
+        "loyaltyDiscount": 20,
+        "billDiscount": 20,
+        "productDiscount": 50,
+        "mrp": 1500,
+        "skuCode": "S2474367",
+        "orderInfo": { "status": "INVOICED", "createdAt": "2023-11-06T16:15:15" },
+        "wastageAmount": 1,
+        "makingCharges": 2,
+        "otherCharges": 3,
+        "totalCharges": 4,
+        "weight": 5,
+        "salesPerson": "John Doe",
+        "posProductInfo": { "price": 600, "mrp": 600 }
+      },
+      {
+        "total": 600,
+        "netAmount": 580,
+        "quantity": 2,
+        "price": 600,
+        "IGSTAmt": 0,
+        "CGSTAmt": 54.21,
+        "SGSTAmt": 54.21,
+        "CESSAmt": 0,
+        "CGSTRate": 9,
+        "IGSTRate": 0,
+        "SGSTRate": 9,
+        "CESSRate": 0,
+        "loyaltyDiscount": 10,
+        "billDiscount": 10,
+        "productDiscount": 0,
+        "mrp": 800,
+        "skuCode": "S2474368",
+        "orderInfo": { "status": "INVOICED", "createdAt": "2023-11-06T16:15:15" },
+        "wastageAmount": 0,
+        "makingCharges": 0,
+        "otherCharges": 0,
+        "totalCharges": 0,
+        "salesPerson": "John Doe",
+        "posProductInfo": { "price": 300, "mrp": 300 }
+      }
+    ],
+    "paymentSplits": [
+      { "mode": "RED", "value": 0, "name": "Redemption Token", "shortcode": "RED", "excludeLoyaltyEarn": false },
+      { "mode": "VCH", "value": 1520, "name": "Digital Money", "shortcode": "DIGIM", "excludeLoyaltyEarn": false },
+      { "mode": "loyalty", "value": 0, "excludeLoyaltyEarn": true },
+      { "mode": "Couponcode", "value": 0, "excludeLoyaltyEarn": false }
+    ],
+    "offerCodes": ["BILLOFFER100RS"],
+    "billAmount": 1800.0,
+    "billNetAmount": 1630.0,
+    "storeCode": "IMP",
+    "customerMobile": "{{mobile}}",
+    "customerEmail": "again.me@email.com",
+    "customerName": "abc",
+    "billTaxAmount": 404.84,
+    "campaignInfo": { "campaignId": "campaingid" },
+    "billLevelWastageAmount": 1,
+    "billLevelMakingCharges": 2,
+    "billLevelOtherCharges": 3,
+    "billLevelTotalCharges": 4
+  }
+]
         },
         {
           "action": "validateRedeem",
-          "data": { "customerMobile": "9876543210", "pointsToRedeem": 10, "otpCode": "509293" }
+          "data": {
+  "transactionId": "{{transactionId}}",
+  "transactionDate": "2025-10-07T13:05:49.205Z",
+  "channel": "POS",
+  "storeCode": "IMP",
+  "customerMobile": "{{mobile}}",
+  "customerEmail": "again.me@email.com",
+  "pointsToRedeem": 30,
+  "orderItems": [
+    {
+      "skuCode": "S2474367",
+      "quantity": 2,
+      "price": 1200,
+      "offerCodes": ["offer-1"],
+      "posProductInfo": { "price": 500, "mrp": 500 }
+    },
+    {
+      "skuCode": "S2474368",
+      "quantity": 2,
+      "price": 600,
+      "posProductInfo": { "price": 500, "mrp": 500 }
+    }
+  ],
+  "billAmount": 1800
+}
         },
         {
           "action": "blockRedeem",
-          "data": { "customerMobile": "9876543210", "pointsToRedeem": 10, "otpCode": "509293" }
+          "data": {
+  "transactionId": "{{transactionId}}",
+  "transactionDate": "2025-10-07T13:05:49.205Z",
+  "channel": "POS",
+  "storeCode": "IMP",
+  "otpCode": "509293",
+  "customerMobile": "{{mobile}}",
+  "customerEmail": "again.me@email.com",
+  "pointsToRedeem": 30,
+  "orderItems": [
+    { "skuCode": "S2474367", "quantity": 2, "price": 1200, "posProductInfo": { "price": 500, "mrp": 500 } },
+    { "skuCode": "S2474368", "quantity": 2, "price": 600, "posProductInfo": { "price": 500, "mrp": 500 } }
+  ],
+  "billAmount": 1800
+}
         }
       ],
       "verify": {
-        "expected": { "loyalty.group.points": 120 }
+        "expected": { "loyalty.group.points": 8 }
       }
     }
   ]
