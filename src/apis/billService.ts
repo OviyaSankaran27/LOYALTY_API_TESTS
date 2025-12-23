@@ -1,14 +1,7 @@
-import axios from "axios";
-import { BASE_URL, API_KEY } from "../config/env";
+import api from "../config/axios";
+import { Bill } from "../models/BillModel";
 
-const headers = {
-  "x-api-key": API_KEY,
-  "Content-Type": "application/json"
-};
-
-export const generateBill = async (payload: any) => {
-  const res = await axios.post(`${BASE_URL}/bills`, payload, {
-    headers
-  });
+export const generateBill = async (billData: Bill) => {
+  const res = await api.post("/bills", billData);
   return res.data;
 };

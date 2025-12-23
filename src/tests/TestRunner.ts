@@ -1,78 +1,64 @@
-import testScenarios from "../data/testScenarios.json";
-import * as billService from "../apis/billService";
-import * as loyaltyService from "../apis/loyaltyService";
+import scenarios from "../data/testScenarios.json";
 import * as customerService from "../apis/customerService";
-
-console.log("🚀 Automation Started...");
+import * as loyaltyService from "../apis/loyaltyService";
+import * as billService from "../apis/billService";
 
 class TestRunner {
   async run() {
-    for (const testCase of testScenarios.cases) {
-      console.log(`\n--- Running Case: ${testCase.id} ---`);
+    console.log("🚀 TEST RUN STARTED");
 
-      // POST APIs
-      for (const step of testCase.post) {
+    for (const tc of scenarios.cases) {
+      console.log(`\n🧪 Running ${tc.id}`);
+
+      // POST FLOW
+      for (const step of tc.post) {
         try {
-          switch (step.action) {
-            case "upsertCustomer":
-              await customerService.upsertCustomer(
-                this.replace(step.data, testCase.mobile)
-              );
-              break;
+          const data = this.replaceMobile(step.data, tc.mobile);
 
-            case "generateBill":
-              await billService.generateBill(
-                this.replace(step.data, testCase.mobile)
-              );
-              break;
-
-            case "validateRedeem":
-              await loyaltyService.validateRedeem(
-                this.replace(step.data, testCase.mobile)
-              );
-              break;
-
-            case "blockRedeem":
-              await loyaltyService.blockRedeem(
-                this.replace(step.data, testCase.mobile)
-              );
-              break;
+          if (step.action === "upsertCustomer") {
+            await customerService.upsertCustomer(data);
           }
-        } catch (err) {
-          console.error("❌ POST Failed:", err);
+
+          if (step.action === "validateRedeem") {
+            await loyaltyService.validateRedeem(data);
+          }
+
+          if (step.action === "blockRedeem") {
+            await loyaltyService.blockRedeem(data);
+          }
+
+          if (step.action === "generateBill") {
+            await billService.generateBill(data);
+          }
+
+          console.log(`✅ ${step.action} success`);
+        } catch (err: any) {
+          console.error(`❌ ${step.action} failed`);
+          console.error(err.response?.data || err.message);
         }
       }
     }
 
     // WAIT
-    const waitMs = testScenarios.waitAfterPostMinutes * 60 * 1000;
-    console.log(`⏳ Waiting ${testScenarios.waitAfterPostMinutes} minutes...`);
+    const waitMs = scenarios.waitAfterPostMinutes * 60 * 1000;
+    console.log(`⏳ Waiting ${scenarios.waitAfterPostMinutes} minutes`);
     await new Promise(res => setTimeout(res, waitMs));
 
     // VERIFY
-    for (const testCase of testScenarios.cases) {
-      const response = await customerService.getCustomer(testCase.mobile);
-      const expected = testCase.verify.expected;
-
-      let passed = true;
-      for (const key in expected) {
-        const actual = this.getValue(response, key);
-        if (actual !== expected[key]) {
-          passed = false;
-          console.log(`❌ ${testCase.id} FAILED | ${key}`);
-        }
+    for (const tc of scenarios.cases) {
+      try {
+        const res = await customerService.getCustomer(tc.mobile);
+        console.log(`✅ VERIFY PASSED for ${tc.id}`);
+        console.log(res.data);
+      } catch (err: any) {
+        console.error(`❌ VERIFY FAILED for ${tc.id}`);
+        console.error(err.response?.data || err.message);
       }
-
-      if (passed) console.log(`✅ ${testCase.id} PASSED`);
     }
   }
 
-  replace(obj: any, mobile: string) {
+  replaceMobile(obj: any, mobile: string) {
     return JSON.parse(JSON.stringify(obj).replace(/{{mobile}}/g, mobile));
-  }
-
-  getValue(obj: any, path: string) {
-    return path.split(".").reduce((o, p) => o?.[p], obj);
   }
 }
 

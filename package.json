@@ -1,23 +1,14 @@
 {
-  "name": "loyalty_api_tests",
+  "name": "loyalty-api-tests",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "ts-node src/tests/TestRunner.ts"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs",
   "dependencies": {
-    "@types/jest": "^30.0.0",
-    "axios": "^1.13.2",
-    "jest": "^30.2.0",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.9.3"
+    "axios": "^1.6.0"
   },
   "devDependencies": {
-    "@types/node": "^25.0.3"
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
   }
 }
