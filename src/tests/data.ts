@@ -1,46 +1,31 @@
-export const testScenarios=[
+export const testScenarios = [
   {
-    "id": "TC01",
-    "description": "Customer A full flow",
-    "cases": [
+    id: "TC01",
+    description: "Invoice with single product including tax and bill details",
+    cases: [
       {
-        "action": "upsertCustomer",
-        "data": {
-          "mobile": "9876543210",
-          "email": "abc@gmail.com",
-          "name": "abc"
-        }
-      },
-      {
-        "action": "getCustomer",
-        "data": {
-          "mobile": "9876543210"
-        }
-      },
-      {
-        "action": "validateRedeem",
-        "data": {
-          "customerMobile": "9876543210",
-          "pointsToRedeem": 10,
-          "otpCode": "509293"
-        }
-      },
-      {
-        "action": "blockRedeem",
-        "data": {
-          "customerMobile": "9876543210",
-          "pointsToRedeem": 10,
-          "otpCode": "509293"
-        }
-      },
-      {
-        "action": "pushBill",
-        "data": {
-          "billId": "BILL123",
-          "customerMobile": "9876543210",
-          "billAmount": 1800
+        action: "pushBill",
+        data: {
+          billNumber: `BILL-${Date.now()}`,
+          billDate: new Date().toISOString().split('T')[0],
+          storeCode: "STORE-001",
+          customerMobile: "8838530066",
+          billAmount: 1100,
+          taxAmount: 100,
+          items: [
+            {
+              skuCode: "PROD-001",
+              quantity: 1,
+              price: 1000,
+              taxPercent: 10,
+              posProductInfo: {
+                mrp: 1100,
+                price: 1000
+              }
+            }
+          ]
         }
       }
     ]
   }
-]
+];

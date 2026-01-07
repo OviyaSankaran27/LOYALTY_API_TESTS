@@ -11,4 +11,9 @@ const api = axios.create({
   timeout: 10000
 });
 
+api.interceptors.request.use((config) => {
+  console.log(`HTTP_REQUEST: [${config.method?.toUpperCase()}] ${config.url}`);
+  return config;
+});
+
 export default api;

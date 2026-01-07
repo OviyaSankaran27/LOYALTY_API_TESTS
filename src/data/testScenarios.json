@@ -1,50 +1,26 @@
-{
-  "waitAfterPostMinutes": 0.1,
-  "cases": [
-    {
-      "id": "TC01",
-      "mobile": "9876543210",
-      "post": [
-        {
-          "action": "upsertCustomer",
-          "data": {
-            "mobile": "{{mobile}}",
-            "email": "test@gmail.com",
-            "name": "Test User"
-          }
-        },
-        {
-          "action": "validateRedeem",
-          "data": {
-            "transactionId": "TXN001",
-            "transactionDate": "2025-10-07T13:05:49.205Z",
-            "channel": "POS",
-            "storeCode": "IMP",
-            "customerMobile": "{{mobile}}",
-            "customerEmail": "test@gmail.com",
-            "pointsToRedeem": 10,
-            "billAmount": 1000
-          }
-        },
-        {
-          "action": "blockRedeem",
-          "data": {
-            "transactionId": "TXN001",
-            "transactionDate": "2025-10-07T13:05:49.205Z",
-            "channel": "POS",
-            "storeCode": "IMP",
-            "otpCode": "509293",
-            "customerMobile": "{{mobile}}",
-            "customerEmail": "test@gmail.com",
-            "pointsToRedeem": 10,
-            "billAmount": 1000
-          }
+[
+  {
+    "id": "TC01",
+    "description": "Redeem validation and block",
+    "cases": [
+      {
+        "action": "getCustomer",
+        "data": {
+          "mobile": "9597915549"
         }
-      ],
-      "verify": {
-        "mobile": "{{mobile}}",
-        "name": "Test User"
+      },
+      {
+        "action": "validateRedeem",
+        "data": {
+          "mobile": "9597915549"
+        }
+      },
+      {
+        "action": "blockRedeem",
+        "data": {
+          "mobile": "9597915549"
+        }
       }
-    }
-  ]
-}
+    ]
+  }
+]

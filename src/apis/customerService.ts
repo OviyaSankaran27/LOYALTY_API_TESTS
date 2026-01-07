@@ -1,13 +1,11 @@
 import api from "../config/axios";
 
-export const upsertCustomer = async (payload: any) => {
-  const res = await api.post("/customers/upsert", payload);
-  return res.data;
+export const upsertCustomer = async (data: any) => {
+  const response = await api.post("/customers", data);
+  return response.data;
 };
 
 export const getCustomer = async (mobile: string) => {
-  const res = await api.get("/customers", {
-    params: { mobile }
-  });
-  return res.data;
+  const response = await api.get(`/customers?mobile=${mobile}`);
+  return response.data;
 };
