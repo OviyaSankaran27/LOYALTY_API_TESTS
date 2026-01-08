@@ -6,24 +6,57 @@ export const testScenarios = [
       {
         action: "pushBill",
         data: {
-          billNumber: `BILL-${Date.now()}`,
-          billDate: new Date().toISOString().split('T')[0],
-          storeCode: "STORE-001",
-          customerMobile: "8838530066",
-          billAmount: 1100,
-          taxAmount: 100,
-          items: [
+          billNumber: "AUTO",
+          billGuid: "AUTO",
+          invoiceType: "SALE",
+
+          customerMobile: "9876543210",
+          customerEmail: "test@gmail.com",
+
+          storeCode: "IMP",
+          channel: "POS",
+          currency: "INR",
+          billDate: new Date().toISOString(),
+
+          netAmount: 500,
+          taxAmount: 90,
+          billAmount: 590,
+
+          orderItems: [
             {
-              skuCode: "PROD-001",
+              skuCode: "SKU001",
               quantity: 1,
-              price: 1000,
-              taxPercent: 10,
+              price: 500,
+              tax: 90,
               posProductInfo: {
-                mrp: 1100,
-                price: 1000
+                price: 500,
+                mrp: 590
               }
             }
+          ],
+
+          paymentSplits: [
+            {
+              paymentMode: "CASH",
+              amount: 590
+            }
           ]
+        }
+      },
+
+      {
+        action: "upsertCustomer",
+        data: {
+          mobile: "9876543210",
+          name: "Test User",
+          email: "test@gmail.com"
+        }
+      },
+
+      {
+        action: "getCustomer",
+        data: {
+          mobile: "9876543210"
         }
       }
     ]

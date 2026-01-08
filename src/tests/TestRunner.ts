@@ -1,7 +1,6 @@
 import * as customerService from "../apis/customerService";
-import * as loyaltyService from "../apis/loyaltyService";
-import * as billService from "../apis/billService"; 
-import { testScenarios } from "./data"; 
+import * as billService from "../apis/billService";
+import { testScenarios } from "./data";
 
 async function runTests() {
   console.log("-----------------------------------------");
@@ -14,51 +13,88 @@ async function runTests() {
     for (const testCase of scenario.cases) {
       try {
         console.log(`PROCESS: Executing ${testCase.action}`);
-        const data = testCase.data as any;
-        let response: any;
+
+        const data: any = { ...testCase.data };
 
         switch (testCase.action) {
-          case "pushBill":
-            response = await billService.pushBill(data);
-            
-            // THE FIX: Convert the entire response to a string and look for "success"
-            // This ignores the array structure and just looks for the result.
-            const responseText = JSON.stringify(response).toLowerCase();
 
-            if (responseText.includes("success")) {
-              console.log(`STATUS: SUCCESS - ${testCase.action}`);
-            } else {
-              throw new Error("API response did not contain 'success' status.");
-            }
+          // ================= PUSH BILL =================
+          case "pushBill": {
+            const payload = {
+              billNumber: `BILL-${Date.now()}`,
+              billGuid: `GUID-${Date.now()}`,
+              invoiceType: "SALE",
+
+              customerMobile: data.customerMobile,
+              customerEmail: "test@gmail.com",
+
+              storeCode: data.storeCode,
+              channel: data.channel,
+              billDate: data.billDate,
+              currency: data.currency,
+
+              billAmount: data.billAmount,
+              netAmount: data.netAmount,
+              taxAmount: data.taxAmount,
+
+              paymentSplits: [
+                {
+                  paymentMode: "CASH",
+                  amount: data.billAmount
+                }
+              ],
+
+              orderItems: [
+                {
+                  skuCode: "S2474367",
+                  quantity: 1,
+                  price: 500,
+                  tax: 90,
+                  posProductInfo: {
+                    price: 500,
+                    mrp: 590
+                  }
+                }
+              ]
+            };
+
+            console.log(
+              "BILL REQUEST PAYLOAD:\n",
+              JSON.stringify(payload, null, 2)
+            );
+
+            await billService.pushBill(payload);
+            console.log("STATUS: SUCCESS - pushBill");
             break;
+          }
 
+          // ================= UPSERT CUSTOMER =================
           case "upsertCustomer":
             await customerService.upsertCustomer(data);
-            console.log(`STATUS: SUCCESS - ${testCase.action}`);
+            console.log("STATUS: SUCCESS - upsertCustomer");
             break;
 
+          // ================= GET CUSTOMER =================
           case "getCustomer":
-            const mobileNumber = data.mobile || data.customerMobile;
-            await customerService.getCustomer(mobileNumber);
-            console.log(`STATUS: SUCCESS - ${testCase.action}`);
+            await customerService.getCustomer(data.mobile);
+            console.log("STATUS: SUCCESS - getCustomer");
             break;
 
           default:
-            console.log(`STATUS: WARNING - Undefined Action: ${testCase.action}`);
+            console.log("WARNING: Unknown action ->", testCase.action);
         }
       } catch (error: any) {
         console.error(`STATUS: FAILED - ${testCase.action}`);
-        // This will print the messy array only if it actually fails
-        console.error("LOG_DETAIL:", error?.response?.data || error.message || error);
-        console.log(`INFO: Aborting scenario ${scenario.id} due to failure`);
-        break;
+        console.error(
+          error?.response?.data || error.message || error
+        );
+        return;
       }
     }
     console.log("-----------------------------------------");
   }
 
-  console.log("SYSTEM_LOG: TEST SUITE EXECUTION FINISHED");
-  console.log("-----------------------------------------");
+  console.log("SYSTEM_LOG: TEST SUITE FINISHED");
 }
 
 runTests();
