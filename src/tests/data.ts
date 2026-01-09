@@ -1,7 +1,7 @@
 export const testScenarios = [
   {
-    id: "TC04",
-    description: "Invoice with multiple products with bill discount and product discount",
+    id: "TC02",
+    description: "Invoice bill of ₹1000 with current date and time",
     cases: [
       {
         action: "pushBill",
@@ -12,7 +12,7 @@ export const testScenarios = [
             billType: "Retail",
             channel: "POS",
 
-            billDate: new Date().toISOString(),
+            billDate: new Date().toISOString(), // ✅ CURRENT DATE & TIME
 
             transactionId: `TXN-${Date.now()}`,
             billId: `BILL-${Date.now()}`,
@@ -20,23 +20,23 @@ export const testScenarios = [
             orderStatus: "INVOICED",
             orderStatusCreationDateTime: new Date().toISOString(),
 
-            // ---------------- BILL LEVEL DISCOUNT ----------------
-            billLevelOfferDiscount: 100,
+            // ---------------- NO DISCOUNTS ----------------
+            billLevelOfferDiscount: 0,
             billLevelProductDiscount: 0,
             billLevelFooterDiscount: 0,
             billLevelLoyaltyDiscount: 0,
-            totalDiscountAmount: 200, // 100 bill + 100 product
+            totalDiscountAmount: 0,
 
             // ---------------- ORDER ITEMS ----------------
             orderItems: [
               {
-                skuCode: "SKU001",
+                skuCode: "SKU1000",
                 quantity: 1,
-                price: 800,
-                mrp: 800,
+                price: 1000,
+                mrp: 1000,
 
-                total: 800,
-                netAmount: 750, // 800 - 50 product discount
+                total: 1000,
+                netAmount: 1000,
 
                 IGSTAmt: 0,
                 CGSTAmt: 0,
@@ -48,61 +48,30 @@ export const testScenarios = [
                 SGSTRate: 0,
                 CESSRate: 0,
 
-                productDiscount: 50,
-                billDiscount: 0,
-                loyaltyDiscount: 0,
-
                 posProductInfo: {
-                  price: 800,
-                  mrp: 800
-                }
-              },
-              {
-                skuCode: "SKU002",
-                quantity: 1,
-                price: 700,
-                mrp: 700,
-
-                total: 700,
-                netAmount: 650, // 700 - 50 product discount
-
-                IGSTAmt: 0,
-                CGSTAmt: 0,
-                SGSTAmt: 0,
-                CESSAmt: 0,
-
-                IGSTRate: 0,
-                CGSTRate: 0,
-                SGSTRate: 0,
-                CESSRate: 0,
-
-                productDiscount: 50,
-                billDiscount: 0,
-                loyaltyDiscount: 0,
-
-                posProductInfo: {
-                  price: 700,
-                  mrp: 700
+                  price: 1000,
+                  mrp: 1000
                 }
               }
             ],
-
-            // ---------------- FINAL TOTALS ----------------
-            billNetAmount: 1400, // 750 + 650
-            billTaxAmount: 0,
-            billAmount: 1300, // 1400 - 100 bill discount
 
             // ---------------- PAYMENT ----------------
             paymentSplits: [
               {
                 mode: "CASH",
-                value: 1300,
+                value: 1000,
                 excludeLoyaltyEarn: false
               }
             ],
 
+            // ---------------- FINAL TOTALS ----------------
+            billAmount: 1000,
+            billNetAmount: 1000,
+            billTaxAmount: 0,
+
             // ---------------- STORE & CUSTOMER ----------------
             storeCode: "IMP",
+
             customerMobile: "9876543210",
             customerEmail: "test@gmail.com",
             customerName: "Test Customer"
