@@ -1,63 +1,82 @@
 export const testScenarios = [
   {
-    id: "TC01",
-    description: "Invoice with single product including tax and bill details",
+    id: "TC02",
+    description: "Invoice bill of ₹1000 with current date and time",
     cases: [
       {
         action: "pushBill",
-        data: {
-          billNumber: "AUTO",
-          billGuid: "AUTO",
-          invoiceType: "SALE",
+        data: [
+          {
+            // ---------------- BASIC BILL DETAILS ----------------
+            invoiceType: "IN",
+            billType: "Retail",
+            channel: "POS",
 
-          customerMobile: "9876543210",
-          customerEmail: "test@gmail.com",
+            billDate: new Date().toISOString(), // ✅ CURRENT DATE & TIME
 
-          storeCode: "IMP",
-          channel: "POS",
-          currency: "INR",
-          billDate: new Date().toISOString(),
+            transactionId: `TXN-${Date.now()}`,
+            billId: `BILL-${Date.now()}`,
 
-          netAmount: 500,
-          taxAmount: 90,
-          billAmount: 590,
+            orderStatus: "INVOICED",
+            orderStatusCreationDateTime: new Date().toISOString(),
 
-          orderItems: [
-            {
-              skuCode: "SKU001",
-              quantity: 1,
-              price: 500,
-              tax: 90,
-              posProductInfo: {
-                price: 500,
-                mrp: 590
+            // ---------------- NO DISCOUNTS ----------------
+            billLevelOfferDiscount: 0,
+            billLevelProductDiscount: 0,
+            billLevelFooterDiscount: 0,
+            billLevelLoyaltyDiscount: 0,
+            totalDiscountAmount: 0,
+
+            // ---------------- ORDER ITEMS ----------------
+            orderItems: [
+              {
+                skuCode: "SKU1000",
+                quantity: 1,
+                price: 1000,
+                mrp: 1000,
+
+                total: 1000,
+                netAmount: 1000,
+
+                IGSTAmt: 0,
+                CGSTAmt: 0,
+                SGSTAmt: 0,
+                CESSAmt: 0,
+
+                IGSTRate: 0,
+                CGSTRate: 0,
+                SGSTRate: 0,
+                CESSRate: 0,
+
+                posProductInfo: {
+                  price: 1000,
+                  mrp: 1000
+                }
               }
-            }
-          ],
+            ],
 
-          paymentSplits: [
-            {
-              paymentMode: "CASH",
-              amount: 590
-            }
-          ]
-        }
-      },
+            // ---------------- PAYMENT ----------------
+            paymentSplits: [
+              {
+                mode: "CASH",
+                value: 1000,
+                excludeLoyaltyEarn: false
+              }
+            ],
 
-      {
-        action: "upsertCustomer",
-        data: {
-          mobile: "9876543210",
-          name: "Test User",
-          email: "test@gmail.com"
-        }
-      },
+            // ---------------- FINAL TOTALS ----------------
+            billAmount: 1000,
+            billNetAmount: 1000,
+            billTaxAmount: 0,
 
-      {
-        action: "getCustomer",
-        data: {
-          mobile: "9876543210"
-        }
+            // ---------------- STORE & CUSTOMER ----------------
+            storeCode: "IMP",
+
+            customerMobile: "9876543210",
+            customerEmail: "test@gmail.com",
+            customerName: "Test Customer"
+          }
+        ]
       }
     ]
   }
