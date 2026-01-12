@@ -1,33 +1,33 @@
 export const testScenarios = [
   {
-    id: "TC03",
-    description: "Invoice with multiple products and bill-level discount",
+    id: "TC04",
+    description:
+      "Invoice with multiple products, bill discount, product discount and loyalty discount",
     cases: [
       {
         action: "pushBill",
         data: [
           {
-            // ---------------- BASIC BILL DETAILS ----------------
+            // ---------------- BASIC DETAILS ----------------
             invoiceType: "IN",
             billType: "Retail",
             channel: "POS",
 
             billDate: new Date().toISOString(),
-
             transactionId: `TXN-${Date.now()}`,
             billId: `BILL-${Date.now()}`,
 
             orderStatus: "INVOICED",
             orderStatusCreationDateTime: new Date().toISOString(),
 
-            // ---------------- BILL LEVEL DISCOUNT ----------------
-            billLevelOfferDiscount: 100,   // ₹100 discount
+            // ---------------- DISCOUNTS ----------------
+            billLevelOfferDiscount: 100,     // bill discount
             billLevelProductDiscount: 0,
             billLevelFooterDiscount: 0,
-            billLevelLoyaltyDiscount: 0,
-            totalDiscountAmount: 100,
+            billLevelLoyaltyDiscount: 100,   // loyalty discount
+            totalDiscountAmount: 300,        // 100 bill + 100 loyalty + 100 product
 
-            // ---------------- ORDER ITEMS ----------------
+            // ---------------- PRODUCTS ----------------
             orderItems: [
               {
                 skuCode: "SKU001",
@@ -35,7 +35,11 @@ export const testScenarios = [
                 price: 800,
                 mrp: 800,
                 total: 800,
-                netAmount: 800,
+                netAmount: 750,
+
+                productDiscount: 50,
+                billDiscount: 0,
+                loyaltyDiscount: 0,
 
                 IGSTAmt: 0,
                 CGSTAmt: 0,
@@ -58,7 +62,11 @@ export const testScenarios = [
                 price: 700,
                 mrp: 700,
                 total: 700,
-                netAmount: 700,
+                netAmount: 650,
+
+                productDiscount: 50,
+                billDiscount: 0,
+                loyaltyDiscount: 0,
 
                 IGSTAmt: 0,
                 CGSTAmt: 0,
@@ -77,17 +85,17 @@ export const testScenarios = [
               }
             ],
 
-            // ---------------- FINAL TOTALS ----------------
-            billNetAmount: 1500,   // 800 + 700
+            // ---------------- TOTALS ----------------
+            billNetAmount: 1400,
             billTaxAmount: 0,
-            billAmount: 1400,      // 1500 - 100 discount
+            billAmount: 1100,
 
             // ---------------- PAYMENT ----------------
             paymentSplits: [
               {
                 mode: "CASH",
-                value: 1400,
-                excludeLoyaltyEarn: false
+                value: 1100,
+                excludeLoyaltyEarn: true   // redemption bill
               }
             ],
 
