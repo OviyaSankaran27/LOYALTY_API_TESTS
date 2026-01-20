@@ -1,7 +1,7 @@
 export const testScenarios = [
   {
-    id: "TC08_EXCHANGE_TWO_PRODUCTS_SAME_PRICE",
-    description: "Exchange 2 products from a multiple product bill with new products of same price",
+    id: "TC09_EXCHANGE_TWO_PRODUCTS_CHEAPER",
+    description: "Exchange 2 products from a multiple product bill with new products cheaper than old products",
     cases: [
       // Original bill with multiple products
       {
@@ -20,20 +20,20 @@ export const testScenarios = [
             orderStatusCreationDateTime: new Date().toISOString(),
 
             // Discounts (if any)
-            billLevelOfferDiscount: 50,
+            billLevelOfferDiscount: 0,
             billLevelProductDiscount: 0,
             billLevelFooterDiscount: 0,
             billLevelLoyaltyDiscount: 0,
-            totalDiscountAmount: 50, // only bill-level discount
+            totalDiscountAmount: 0,
 
             orderItems: [
               {
                 skuCode: "SKU001",
                 quantity: 1,
-                price: 500,
-                mrp: 500,
-                total: 500,
-                netAmount: 475, // after proportional discount
+                price: 800,
+                mrp: 800,
+                total: 800,
+                netAmount: 800,
                 productDiscount: 0,
                 IGSTAmt: 0,
                 CGSTAmt: 0,
@@ -43,7 +43,7 @@ export const testScenarios = [
                 CGSTRate: 0,
                 SGSTRate: 0,
                 CESSRate: 0,
-                posProductInfo: { price: 500, mrp: 500 }
+                posProductInfo: { price: 800, mrp: 800 }
               },
               {
                 skuCode: "SKU002",
@@ -51,7 +51,7 @@ export const testScenarios = [
                 price: 700,
                 mrp: 700,
                 total: 700,
-                netAmount: 665, // after proportional discount
+                netAmount: 700,
                 productDiscount: 0,
                 IGSTAmt: 0,
                 CGSTAmt: 0,
@@ -83,14 +83,14 @@ export const testScenarios = [
               }
             ],
 
-            billNetAmount: 1740, // sum of netAmounts
+            billNetAmount: 2100, // sum of netAmounts
             billTaxAmount: 0,
-            billAmount: 1740,
+            billAmount: 2100,
 
             paymentSplits: [
               {
                 mode: "CASH",
-                value: 1740,
+                value: 2100,
                 excludeLoyaltyEarn: false
               }
             ],
@@ -103,7 +103,7 @@ export const testScenarios = [
         ]
       },
 
-      // Exchange bill for 2 products
+      // Exchange bill for 2 products with cheaper new products
       {
         action: "pushReturnBill",
         data: [
@@ -125,10 +125,10 @@ export const testScenarios = [
               {
                 skuCode: "SKU001",
                 quantity: 1,
-                price: 500,
-                mrp: 500,
-                total: 500,
-                netAmount: 475,
+                price: 800,
+                mrp: 800,
+                total: 800,
+                netAmount: 800,
                 productDiscount: 0,
                 IGSTAmt: 0,
                 CGSTAmt: 0,
@@ -138,11 +138,11 @@ export const testScenarios = [
                 CGSTRate: 0,
                 SGSTRate: 0,
                 CESSRate: 0,
-                posProductInfo: { price: 500, mrp: 500 },
+                posProductInfo: { price: 800, mrp: 800 },
                 exchangedWith: {
                   skuCode: "SKU101",
                   quantity: 1,
-                  price: 500,
+                  price: 500, // cheaper product
                   mrp: 500
                 }
               },
@@ -152,7 +152,7 @@ export const testScenarios = [
                 price: 700,
                 mrp: 700,
                 total: 700,
-                netAmount: 665,
+                netAmount: 700,
                 productDiscount: 0,
                 IGSTAmt: 0,
                 CGSTAmt: 0,
@@ -166,20 +166,20 @@ export const testScenarios = [
                 exchangedWith: {
                   skuCode: "SKU102",
                   quantity: 1,
-                  price: 700,
-                  mrp: 700
+                  price: 600, // cheaper product
+                  mrp: 600
                 }
               }
             ],
 
-            billNetAmount: 1140, // sum of netAmounts of returned products
+            billNetAmount: 1500, // sum of returned products = 800 + 700
             billTaxAmount: 0,
-            billAmount: 1140,
+            billAmount: 1500,
 
             paymentSplits: [
               {
                 mode: "CASH",
-                value: 0, // no extra payment, price equal
+                value: 400, // refund for the price difference (2100 - 1500)
                 excludeLoyaltyEarn: true
               }
             ],
