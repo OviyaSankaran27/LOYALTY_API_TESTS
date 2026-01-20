@@ -1,8 +1,7 @@
 export const testScenarios = [
   {
-    id: "TC04_EARN",
-    description:
-      "Invoice with multiple products, bill discount, product discount and loyalty earn",
+    id: "TC05_RETURN_SINGLE",
+    description: "Return Bill with single product",
     cases: [
       {
         action: "pushBill",
@@ -19,22 +18,22 @@ export const testScenarios = [
             orderStatus: "INVOICED",
             orderStatusCreationDateTime: new Date().toISOString(),
 
-            // ✅ DISCOUNTS
-            billLevelOfferDiscount: 100,
+            // Bill without discounts for simplicity
+            billLevelOfferDiscount: 0,
             billLevelProductDiscount: 0,
             billLevelFooterDiscount: 0,
             billLevelLoyaltyDiscount: 0,
-            totalDiscountAmount: 200, // 100 bill + 100 product
+            totalDiscountAmount: 0,
 
             orderItems: [
               {
                 skuCode: "SKU001",
                 quantity: 1,
-                price: 800,
-                mrp: 800,
-                total: 800,
-                netAmount: 750, // ONLY product discount
-                productDiscount: 50,
+                price: 500,
+                mrp: 500,
+                total: 500,
+                netAmount: 500,
+                productDiscount: 0,
 
                 IGSTAmt: 0,
                 CGSTAmt: 0,
@@ -45,47 +44,84 @@ export const testScenarios = [
                 SGSTRate: 0,
                 CESSRate: 0,
 
-                posProductInfo: { price: 800, mrp: 800 }
-              },
-              {
-                skuCode: "SKU002",
-                quantity: 1,
-                price: 700,
-                mrp: 700,
-                total: 700,
-                netAmount: 650,
-                productDiscount: 50,
-
-                IGSTAmt: 0,
-                CGSTAmt: 0,
-                SGSTAmt: 0,
-                CESSAmt: 0,
-                IGSTRate: 0,
-                CGSTRate: 0,
-                SGSTRate: 0,
-                CESSRate: 0,
-
-                posProductInfo: { price: 700, mrp: 700 }
+                posProductInfo: { price: 500, mrp: 500 }
               }
             ],
 
-            // ✅ IMPORTANT FIX
-            billNetAmount: 1300, // 1400 - 100 bill discount
+            billNetAmount: 500,
             billTaxAmount: 0,
-            billAmount: 1200,    // 1300 - 100 product discount
+            billAmount: 500,
 
             paymentSplits: [
               {
                 mode: "CASH",
-                value: 1200,
-                excludeLoyaltyEarn: false // ✅ EARN ENABLED
+                value: 500,
+                excludeLoyaltyEarn: false
               }
             ],
 
             storeCode: "IMP",
             customerMobile: "8838530066",
-            customerEmail: "earn@test.com",
-            customerName: "Earn Customer"
+            customerEmail: "return@test.com",
+            customerName: "Return Customer"
+          }
+        ]
+      },
+      {
+        action: "pushReturnBill",
+        data: [
+          {
+            invoiceType: "RET",
+            originalBillId: `BILL-${Date.now()}`, // link to original bill
+            billType: "Retail",
+            channel: "POS",
+
+            billDate: new Date().toISOString(),
+            transactionId: `TXN-RET-${Date.now()}`,
+            billId: `BILL-RET-${Date.now()}`,
+
+            orderStatus: "RETURNED",
+            orderStatusCreationDateTime: new Date().toISOString(),
+
+            orderItems: [
+              {
+                skuCode: "SKU001",
+                quantity: 1,
+                price: 500,
+                mrp: 500,
+                total: 500,
+                netAmount: 500,
+                productDiscount: 0,
+
+                IGSTAmt: 0,
+                CGSTAmt: 0,
+                SGSTAmt: 0,
+                CESSAmt: 0,
+                IGSTRate: 0,
+                CGSTRate: 0,
+                SGSTRate: 0,
+                CESSRate: 0,
+
+                posProductInfo: { price: 500, mrp: 500 }
+              }
+            ],
+
+            billNetAmount: 500,
+            billTaxAmount: 0,
+            billAmount: 500,
+
+            paymentSplits: [
+              {
+                mode: "CASH",
+                value: 500,
+                excludeLoyaltyEarn: true // No loyalty earned for returns
+              }
+            ],
+
+            storeCode: "IMP",
+            customerMobile: "8838530066",
+            customerEmail: "return@test.com",
+            customerName: "Return Customer"
           }
         ]
       }
