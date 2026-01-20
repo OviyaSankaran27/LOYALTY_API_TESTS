@@ -1,7 +1,7 @@
 export const testScenarios = [
   {
-    id: "TC09_EXCHANGE_TWO_PRODUCTS_CHEAPER",
-    description: "Exchange 2 products from a multiple product bill with new products cheaper than old products",
+    id: "TC10_EXCHANGE_TWO_PRODUCTS_EXPENSIVE",
+    description: "Exchange 2 products from a multiple product bill with new products more expensive than old products",
     cases: [
       // Original bill with multiple products
       {
@@ -19,7 +19,6 @@ export const testScenarios = [
             orderStatus: "INVOICED",
             orderStatusCreationDateTime: new Date().toISOString(),
 
-            // Discounts (if any)
             billLevelOfferDiscount: 0,
             billLevelProductDiscount: 0,
             billLevelFooterDiscount: 0,
@@ -30,10 +29,10 @@ export const testScenarios = [
               {
                 skuCode: "SKU001",
                 quantity: 1,
-                price: 800,
-                mrp: 800,
-                total: 800,
-                netAmount: 800,
+                price: 500,
+                mrp: 500,
+                total: 500,
+                netAmount: 500,
                 productDiscount: 0,
                 IGSTAmt: 0,
                 CGSTAmt: 0,
@@ -43,7 +42,7 @@ export const testScenarios = [
                 CGSTRate: 0,
                 SGSTRate: 0,
                 CESSRate: 0,
-                posProductInfo: { price: 800, mrp: 800 }
+                posProductInfo: { price: 500, mrp: 500 }
               },
               {
                 skuCode: "SKU002",
@@ -83,14 +82,14 @@ export const testScenarios = [
               }
             ],
 
-            billNetAmount: 2100, // sum of netAmounts
+            billNetAmount: 1800, // sum of netAmounts
             billTaxAmount: 0,
-            billAmount: 2100,
+            billAmount: 1800,
 
             paymentSplits: [
               {
                 mode: "CASH",
-                value: 2100,
+                value: 1800,
                 excludeLoyaltyEarn: false
               }
             ],
@@ -103,7 +102,7 @@ export const testScenarios = [
         ]
       },
 
-      // Exchange bill for 2 products with cheaper new products
+      // Exchange bill for 2 products with more expensive new products
       {
         action: "pushReturnBill",
         data: [
@@ -125,10 +124,10 @@ export const testScenarios = [
               {
                 skuCode: "SKU001",
                 quantity: 1,
-                price: 800,
-                mrp: 800,
-                total: 800,
-                netAmount: 800,
+                price: 500,
+                mrp: 500,
+                total: 500,
+                netAmount: 500,
                 productDiscount: 0,
                 IGSTAmt: 0,
                 CGSTAmt: 0,
@@ -138,12 +137,12 @@ export const testScenarios = [
                 CGSTRate: 0,
                 SGSTRate: 0,
                 CESSRate: 0,
-                posProductInfo: { price: 800, mrp: 800 },
+                posProductInfo: { price: 500, mrp: 500 },
                 exchangedWith: {
                   skuCode: "SKU101",
                   quantity: 1,
-                  price: 500, // cheaper product
-                  mrp: 500
+                  price: 700, // more expensive product
+                  mrp: 700
                 }
               },
               {
@@ -166,20 +165,20 @@ export const testScenarios = [
                 exchangedWith: {
                   skuCode: "SKU102",
                   quantity: 1,
-                  price: 600, // cheaper product
-                  mrp: 600
+                  price: 900, // more expensive product
+                  mrp: 900
                 }
               }
             ],
 
-            billNetAmount: 1500, // sum of returned products = 800 + 700
+            billNetAmount: 1200, // sum of old product netAmounts
             billTaxAmount: 0,
-            billAmount: 1500,
+            billAmount: 1200,
 
             paymentSplits: [
               {
                 mode: "CASH",
-                value: 400, // refund for the price difference (2100 - 1500)
+                value: 400, // extra payment needed (700+900 - 500-700 = 400)
                 excludeLoyaltyEarn: true
               }
             ],
