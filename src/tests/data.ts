@@ -1,9 +1,9 @@
 export const testScenarios = [
   {
-    id: "TC07_RETURN_MULTIPLE_BILLDISCOUNT",
-    description: "Return of multiple products from a bill with bill-level discount",
+    id: "TC08_EXCHANGE_TWO_PRODUCTS_SAME_PRICE",
+    description: "Exchange 2 products from a multiple product bill with new products of same price",
     cases: [
-      // Original bill with multiple products and a bill-level discount
+      // Original bill with multiple products
       {
         action: "pushBill",
         data: [
@@ -19,12 +19,12 @@ export const testScenarios = [
             orderStatus: "INVOICED",
             orderStatusCreationDateTime: new Date().toISOString(),
 
-            // Bill-level discount
-            billLevelOfferDiscount: 100,
+            // Discounts (if any)
+            billLevelOfferDiscount: 50,
             billLevelProductDiscount: 0,
             billLevelFooterDiscount: 0,
             billLevelLoyaltyDiscount: 0,
-            totalDiscountAmount: 100, // only bill-level
+            totalDiscountAmount: 50, // only bill-level discount
 
             orderItems: [
               {
@@ -33,7 +33,7 @@ export const testScenarios = [
                 price: 500,
                 mrp: 500,
                 total: 500,
-                netAmount: 450, // after proportional bill-level discount
+                netAmount: 475, // after proportional discount
                 productDiscount: 0,
                 IGSTAmt: 0,
                 CGSTAmt: 0,
@@ -51,7 +51,7 @@ export const testScenarios = [
                 price: 700,
                 mrp: 700,
                 total: 700,
-                netAmount: 630, // after proportional bill-level discount
+                netAmount: 665, // after proportional discount
                 productDiscount: 0,
                 IGSTAmt: 0,
                 CGSTAmt: 0,
@@ -62,46 +62,65 @@ export const testScenarios = [
                 SGSTRate: 0,
                 CESSRate: 0,
                 posProductInfo: { price: 700, mrp: 700 }
+              },
+              {
+                skuCode: "SKU003",
+                quantity: 1,
+                price: 600,
+                mrp: 600,
+                total: 600,
+                netAmount: 600,
+                productDiscount: 0,
+                IGSTAmt: 0,
+                CGSTAmt: 0,
+                SGSTAmt: 0,
+                CESSAmt: 0,
+                IGSTRate: 0,
+                CGSTRate: 0,
+                SGSTRate: 0,
+                CESSRate: 0,
+                posProductInfo: { price: 600, mrp: 600 }
               }
             ],
 
-            billNetAmount: 1080, // sum of netAmounts
+            billNetAmount: 1740, // sum of netAmounts
             billTaxAmount: 0,
-            billAmount: 1080,
+            billAmount: 1740,
 
             paymentSplits: [
               {
                 mode: "CASH",
-                value: 1080,
+                value: 1740,
                 excludeLoyaltyEarn: false
               }
             ],
 
             storeCode: "IMP",
             customerMobile: "8838530066",
-            customerEmail: "return@test.com",
-            customerName: "Return Customer"
+            customerEmail: "exchange@test.com",
+            customerName: "Exchange Customer"
           }
         ]
       },
 
-      // Return bill with multiple products
+      // Exchange bill for 2 products
       {
         action: "pushReturnBill",
         data: [
           {
-            invoiceType: "RET",
+            invoiceType: "EXC",
             originalBillId: `BILL-${Date.now()}`, // link to original bill
             billType: "Retail",
             channel: "POS",
 
             billDate: new Date().toISOString(),
-            transactionId: `TXN-RET-${Date.now()}`,
-            billId: `BILL-RET-${Date.now()}`,
+            transactionId: `TXN-EXC-${Date.now()}`,
+            billId: `BILL-EXC-${Date.now()}`,
 
-            orderStatus: "RETURNED",
+            orderStatus: "EXCHANGED",
             orderStatusCreationDateTime: new Date().toISOString(),
 
+            // Returning SKU001 and SKU002
             orderItems: [
               {
                 skuCode: "SKU001",
@@ -109,7 +128,7 @@ export const testScenarios = [
                 price: 500,
                 mrp: 500,
                 total: 500,
-                netAmount: 450, // proportional discount applied
+                netAmount: 475,
                 productDiscount: 0,
                 IGSTAmt: 0,
                 CGSTAmt: 0,
@@ -119,7 +138,13 @@ export const testScenarios = [
                 CGSTRate: 0,
                 SGSTRate: 0,
                 CESSRate: 0,
-                posProductInfo: { price: 500, mrp: 500 }
+                posProductInfo: { price: 500, mrp: 500 },
+                exchangedWith: {
+                  skuCode: "SKU101",
+                  quantity: 1,
+                  price: 500,
+                  mrp: 500
+                }
               },
               {
                 skuCode: "SKU002",
@@ -127,7 +152,7 @@ export const testScenarios = [
                 price: 700,
                 mrp: 700,
                 total: 700,
-                netAmount: 630, // proportional discount applied
+                netAmount: 665,
                 productDiscount: 0,
                 IGSTAmt: 0,
                 CGSTAmt: 0,
@@ -137,26 +162,32 @@ export const testScenarios = [
                 CGSTRate: 0,
                 SGSTRate: 0,
                 CESSRate: 0,
-                posProductInfo: { price: 700, mrp: 700 }
+                posProductInfo: { price: 700, mrp: 700 },
+                exchangedWith: {
+                  skuCode: "SKU102",
+                  quantity: 1,
+                  price: 700,
+                  mrp: 700
+                }
               }
             ],
 
-            billNetAmount: 1080, // total net of returned products
+            billNetAmount: 1140, // sum of netAmounts of returned products
             billTaxAmount: 0,
-            billAmount: 1080,
+            billAmount: 1140,
 
             paymentSplits: [
               {
                 mode: "CASH",
-                value: 1080,
+                value: 0, // no extra payment, price equal
                 excludeLoyaltyEarn: true
               }
             ],
 
             storeCode: "IMP",
             customerMobile: "8838530066",
-            customerEmail: "return@test.com",
-            customerName: "Return Customer"
+            customerEmail: "exchange@test.com",
+            customerName: "Exchange Customer"
           }
         ]
       }
