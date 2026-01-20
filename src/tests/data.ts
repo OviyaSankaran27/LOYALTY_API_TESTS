@@ -1,8 +1,9 @@
 export const testScenarios = [
   {
-    id: "TC05_RETURN_SINGLE",
-    description: "Return Bill with single product",
+    id: "TC06_PARTIAL_RETURN_SINGLE",
+    description: "Partial return of a single product from a multiple product bill",
     cases: [
+      // Original bill with multiple products
       {
         action: "pushBill",
         data: [
@@ -18,23 +19,22 @@ export const testScenarios = [
             orderStatus: "INVOICED",
             orderStatusCreationDateTime: new Date().toISOString(),
 
-            // Bill without discounts for simplicity
-            billLevelOfferDiscount: 0,
-            billLevelProductDiscount: 0,
+            // Discounts (if any)
+            billLevelOfferDiscount: 50,
+            billLevelProductDiscount: 30,
             billLevelFooterDiscount: 0,
             billLevelLoyaltyDiscount: 0,
-            totalDiscountAmount: 0,
+            totalDiscountAmount: 80, // 50 + 30
 
             orderItems: [
               {
                 skuCode: "SKU001",
                 quantity: 1,
-                price: 500,
-                mrp: 500,
-                total: 500,
-                netAmount: 500,
-                productDiscount: 0,
-
+                price: 800,
+                mrp: 800,
+                total: 800,
+                netAmount: 770, // 30 product discount
+                productDiscount: 30,
                 IGSTAmt: 0,
                 CGSTAmt: 0,
                 SGSTAmt: 0,
@@ -43,30 +43,49 @@ export const testScenarios = [
                 CGSTRate: 0,
                 SGSTRate: 0,
                 CESSRate: 0,
-
-                posProductInfo: { price: 500, mrp: 500 }
+                posProductInfo: { price: 800, mrp: 800 }
+              },
+              {
+                skuCode: "SKU002",
+                quantity: 1,
+                price: 600,
+                mrp: 600,
+                total: 600,
+                netAmount: 600,
+                productDiscount: 0,
+                IGSTAmt: 0,
+                CGSTAmt: 0,
+                SGSTAmt: 0,
+                CESSAmt: 0,
+                IGSTRate: 0,
+                CGSTRate: 0,
+                SGSTRate: 0,
+                CESSRate: 0,
+                posProductInfo: { price: 600, mrp: 600 }
               }
             ],
 
-            billNetAmount: 500,
+            billNetAmount: 1370, // 1400 - 30 product discount
             billTaxAmount: 0,
-            billAmount: 500,
+            billAmount: 1370,
 
             paymentSplits: [
               {
                 mode: "CASH",
-                value: 500,
+                value: 1370,
                 excludeLoyaltyEarn: false
               }
             ],
 
             storeCode: "IMP",
             customerMobile: "8838530066",
-            customerEmail: "return@test.com",
-            customerName: "Return Customer"
+            customerEmail: "partialreturn@test.com",
+            customerName: "Partial Return Customer"
           }
         ]
       },
+
+      // Partial return bill (only SKU001 returned)
       {
         action: "pushReturnBill",
         data: [
@@ -87,12 +106,11 @@ export const testScenarios = [
               {
                 skuCode: "SKU001",
                 quantity: 1,
-                price: 500,
-                mrp: 500,
-                total: 500,
-                netAmount: 500,
-                productDiscount: 0,
-
+                price: 800,
+                mrp: 800,
+                total: 800,
+                netAmount: 770,
+                productDiscount: 30,
                 IGSTAmt: 0,
                 CGSTAmt: 0,
                 SGSTAmt: 0,
@@ -101,27 +119,26 @@ export const testScenarios = [
                 CGSTRate: 0,
                 SGSTRate: 0,
                 CESSRate: 0,
-
-                posProductInfo: { price: 500, mrp: 500 }
+                posProductInfo: { price: 800, mrp: 800 }
               }
             ],
 
-            billNetAmount: 500,
+            billNetAmount: 770, // net of returned product
             billTaxAmount: 0,
-            billAmount: 500,
+            billAmount: 770,
 
             paymentSplits: [
               {
                 mode: "CASH",
-                value: 500,
-                excludeLoyaltyEarn: true // No loyalty earned for returns
+                value: 770,
+                excludeLoyaltyEarn: true
               }
             ],
 
             storeCode: "IMP",
             customerMobile: "8838530066",
-            customerEmail: "return@test.com",
-            customerName: "Return Customer"
+            customerEmail: "partialreturn@test.com",
+            customerName: "Partial Return Customer"
           }
         ]
       }
