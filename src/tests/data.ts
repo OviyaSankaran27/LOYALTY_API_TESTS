@@ -1,195 +1,712 @@
-export const testScenarios = [
-  {
-    id: "TC10_EXCHANGE_TWO_PRODUCTS_EXPENSIVE",
-    description: "Exchange 2 products from a multiple product bill with new products more expensive than old products",
-    cases: [
-      // Original bill with multiple products
-      {
-        action: "pushBill",
-        data: [
-          {
-            invoiceType: "IN",
-            billType: "Retail",
-            channel: "POS",
+export interface TestCase {
+  id: string;
+  mobile: string;
+  postPayload: any;
+  getParams: any;
+}
 
-            billDate: new Date().toISOString(),
-            transactionId: `TXN-${Date.now()}`,
-            billId: `BILL-${Date.now()}`,
+/**
+ * Common bill payload (base)
+ * Mobile, transactionId, billId will be injected per test case
+ */
+const baseBillPayload = {
+  invoiceType: "IN",
+  billType: "Retail",
+  channel: "POS",
+  billDate: new Date().toISOString(),
 
-            orderStatus: "INVOICED",
-            orderStatusCreationDateTime: new Date().toISOString(),
+  billLevelOfferDiscount: 30,
+  billLevelProductDiscount: 100,
+  billLevelFooterDiscount: 10,
+  billLevelLoyaltyDiscount: 30,
+  totalDiscountAmount: 170,
 
-            billLevelOfferDiscount: 0,
-            billLevelProductDiscount: 0,
-            billLevelFooterDiscount: 0,
-            billLevelLoyaltyDiscount: 0,
-            totalDiscountAmount: 0,
+  orderStatus: "INVOICED",
+  orderStatusCreationDateTime: "2023-11-06T16:15:15",
 
-            orderItems: [
-              {
-                skuCode: "SKU001",
-                quantity: 1,
-                price: 500,
-                mrp: 500,
-                total: 500,
-                netAmount: 500,
-                productDiscount: 0,
-                IGSTAmt: 0,
-                CGSTAmt: 0,
-                SGSTAmt: 0,
-                CESSAmt: 0,
-                IGSTRate: 0,
-                CGSTRate: 0,
-                SGSTRate: 0,
-                CESSRate: 0,
-                posProductInfo: { price: 500, mrp: 500 }
-              },
-              {
-                skuCode: "SKU002",
-                quantity: 1,
-                price: 700,
-                mrp: 700,
-                total: 700,
-                netAmount: 700,
-                productDiscount: 0,
-                IGSTAmt: 0,
-                CGSTAmt: 0,
-                SGSTAmt: 0,
-                CESSAmt: 0,
-                IGSTRate: 0,
-                CGSTRate: 0,
-                SGSTRate: 0,
-                CESSRate: 0,
-                posProductInfo: { price: 700, mrp: 700 }
-              },
-              {
-                skuCode: "SKU003",
-                quantity: 1,
-                price: 600,
-                mrp: 600,
-                total: 600,
-                netAmount: 600,
-                productDiscount: 0,
-                IGSTAmt: 0,
-                CGSTAmt: 0,
-                SGSTAmt: 0,
-                CESSAmt: 0,
-                IGSTRate: 0,
-                CGSTRate: 0,
-                SGSTRate: 0,
-                CESSRate: 0,
-                posProductInfo: { price: 600, mrp: 600 }
-              }
-            ],
-
-            billNetAmount: 1800, // sum of netAmounts
-            billTaxAmount: 0,
-            billAmount: 1800,
-
-            paymentSplits: [
-              {
-                mode: "CASH",
-                value: 1800,
-                excludeLoyaltyEarn: false
-              }
-            ],
-
-            storeCode: "IMP",
-            customerMobile: "8838530066",
-            customerEmail: "exchange@test.com",
-            customerName: "Exchange Customer"
-          }
-        ]
+  orderItems: [
+    {
+      total: 1200,
+      netAmount: 1110,
+      quantity: 2,
+      price: 1200,
+      IGSTAmt: 0,
+      CGSTAmt: 101.21,
+      SGSTAmt: 101.21,
+      CESSAmt: 0,
+      CGSTRate: 6,
+      SGSTRate: 6,
+      IGSTRate: 0,
+      CESSRate: 0,
+      offerCodes: ["PRODUCTOFFER10PER"],
+      loyaltyDiscount: 20,
+      billDiscount: 20,
+      productDiscount: 50,
+      mrp: 1500,
+      skuCode: "S2474367",
+      orderInfo: {
+        status: "INVOICED",
+        createdAt: "2023-11-06T16:15:15"
       },
-
-      // Exchange bill for 2 products with more expensive new products
-      {
-        action: "pushReturnBill",
-        data: [
-          {
-            invoiceType: "EXC",
-            originalBillId: `BILL-${Date.now()}`, // link to original bill
-            billType: "Retail",
-            channel: "POS",
-
-            billDate: new Date().toISOString(),
-            transactionId: `TXN-EXC-${Date.now()}`,
-            billId: `BILL-EXC-${Date.now()}`,
-
-            orderStatus: "EXCHANGED",
-            orderStatusCreationDateTime: new Date().toISOString(),
-
-            // Returning SKU001 and SKU002
-            orderItems: [
-              {
-                skuCode: "SKU001",
-                quantity: 1,
-                price: 500,
-                mrp: 500,
-                total: 500,
-                netAmount: 500,
-                productDiscount: 0,
-                IGSTAmt: 0,
-                CGSTAmt: 0,
-                SGSTAmt: 0,
-                CESSAmt: 0,
-                IGSTRate: 0,
-                CGSTRate: 0,
-                SGSTRate: 0,
-                CESSRate: 0,
-                posProductInfo: { price: 500, mrp: 500 },
-                exchangedWith: {
-                  skuCode: "SKU101",
-                  quantity: 1,
-                  price: 700, // more expensive product
-                  mrp: 700
-                }
-              },
-              {
-                skuCode: "SKU002",
-                quantity: 1,
-                price: 700,
-                mrp: 700,
-                total: 700,
-                netAmount: 700,
-                productDiscount: 0,
-                IGSTAmt: 0,
-                CGSTAmt: 0,
-                SGSTAmt: 0,
-                CESSAmt: 0,
-                IGSTRate: 0,
-                CGSTRate: 0,
-                SGSTRate: 0,
-                CESSRate: 0,
-                posProductInfo: { price: 700, mrp: 700 },
-                exchangedWith: {
-                  skuCode: "SKU102",
-                  quantity: 1,
-                  price: 900, // more expensive product
-                  mrp: 900
-                }
-              }
-            ],
-
-            billNetAmount: 1200, // sum of old product netAmounts
-            billTaxAmount: 0,
-            billAmount: 1200,
-
-            paymentSplits: [
-              {
-                mode: "CASH",
-                value: 400, // extra payment needed (700+900 - 500-700 = 400)
-                excludeLoyaltyEarn: true
-              }
-            ],
-
-            storeCode: "IMP",
-            customerMobile: "8838530066",
-            customerEmail: "exchange@test.com",
-            customerName: "Exchange Customer"
-          }
-        ]
+      wastageAmount: 1,
+      makingCharges: 2,
+      otherCharges: 3,
+      totalCharges: 4,
+      weight: 5,
+      salesPerson: "John Doe",
+      posProductInfo: {
+        price: 600,
+        mrp: 600
       }
-    ]
+    },
+    {
+      total: 600,
+      netAmount: 580,
+      quantity: 2,
+      price: 600,
+      IGSTAmt: 0,
+      CGSTAmt: 54.21,
+      SGSTAmt: 54.21,
+      CESSAmt: 0,
+      CGSTRate: 9,
+      SGSTRate: 9,
+      IGSTRate: 0,
+      CESSRate: 0,
+      loyaltyDiscount: 10,
+      billDiscount: 10,
+      productDiscount: 0,
+      mrp: 800,
+      skuCode: "S2474368",
+      orderInfo: {
+        status: "INVOICED",
+        createdAt: "2023-11-06T16:15:15"
+      },
+      wastageAmount: 0,
+      makingCharges: 0,
+      otherCharges: 0,
+      totalCharges: 0,
+      salesPerson: "John Doe",
+      posProductInfo: {
+        price: 300,
+        mrp: 300
+      }
+    }
+  ],
+
+  paymentSplits: [
+    { mode: "RED", value: 0, name: "Redemption Token", shortcode: "RED", excludeLoyaltyEarn: false },
+    { mode: "VCH", value: 1520, name: "Digital Money", shortcode: "DIGIM", excludeLoyaltyEarn: false },
+    { mode: "loyalty", value: 0, excludeLoyaltyEarn: true },
+    { mode: "Couponcode", value: 0, excludeLoyaltyEarn: false }
+  ],
+
+  offerCodes: ["BILLOFFER100RS"],
+  billAmount: 1800,
+  billNetAmount: 1630,
+  storeCode: "IMP",
+  customerEmail: "again.me@email.com",
+  customerName: "abc",
+  billTaxAmount: 404.84,
+  campaignInfo: { campaignId: "campaingid" },
+
+  billLevelWastageAmount: 1,
+  billLevelMakingCharges: 2,
+  billLevelOtherCharges: 3,
+  billLevelTotalCharges: 4
+};
+
+const temp = [
+  {
+    "invoiceType": "IN",
+    "billType": "Retail",
+    "channel": "POS",
+    "billDate": "2025-09-20T12:37:04.967Z",
+    "billLevelOfferDiscount": 30,
+    "billLevelProductDiscount": 100,
+    "billLevelFooterDiscount": 10,
+    "billLevelLoyaltyDiscount": 30,
+    "totalDiscountAmount": 170,
+    "transactionId": "{{billTransactionId}}",
+    "billId": "ID_02_new4",
+    "orderId": "ECOM_ID_01",
+    "shipmentId": "ECOM_SHIPMENT_ID_01",
+    "orderStatus": "INVOICED",
+    "orderStatusCreationDateTime": "2023-11-06T16:15:15",
+    "orderItems": [
+      {
+        "total": 1200,
+        "netAmount": 1110,
+        "quantity": 2,
+        "price": 1200,
+        "IGSTAmt": 0,
+        "CGSTAmt": 101.21,
+        "SGSTAmt": 101.21,
+        "CESSAmt": 0,
+        "CGSTRate": 6,
+        "SGSTRate": 6,
+        "IGSTRate": 0,
+        "CESSRate": 0,
+        "offerCodes": ["PRODUCTOFFER10PER"],
+        "loyaltyDiscount": 20,
+        "billDiscount": 20,
+        "productDiscount": 50,
+        "mrp": 1500,
+        "skuCode": "S2474367",
+        "orderInfo": { "status": "INVOICED", "createdAt": "2023-11-06T16:15:15" },
+        "wastageAmount": 1,
+        "makingCharges": 2,
+        "otherCharges": 3,
+        "totalCharges": 4,
+        "weight": 5,
+        "salesPerson": "John Doe",
+        "posProductInfo": { "price": 600, "mrp": 600 }
+      },
+      {
+        "total": 600,
+        "netAmount": 580,
+        "quantity": 2,
+        "price": 600,
+        "IGSTAmt": 0,
+        "CGSTAmt": 54.21,
+        "SGSTAmt": 54.21,
+        "CESSAmt": 0,
+        "CGSTRate": 9,
+        "IGSTRate": 0,
+        "SGSTRate": 9,
+        "CESSRate": 0,
+        "loyaltyDiscount": 10,
+        "billDiscount": 10,
+        "productDiscount": 0,
+        "mrp": 800,
+        "skuCode": "S2474368",
+        "orderInfo": { "status": "INVOICED", "createdAt": "2023-11-06T16:15:15" },
+        "wastageAmount": 0,
+        "makingCharges": 0,
+        "otherCharges": 0,
+        "totalCharges": 0,
+        "salesPerson": "John Doe",
+        "posProductInfo": { "price": 300, "mrp": 300 }
+      }
+    ],
+    "paymentSplits": [
+      { "mode": "RED", "value": 0, "name": "Redemption Token", "shortcode": "RED", "excludeLoyaltyEarn": false },
+      { "mode": "VCH", "value": 1520, "name": "Digital Money", "shortcode": "DIGIM", "excludeLoyaltyEarn": false },
+      { "mode": "loyalty", "value": 0, "excludeLoyaltyEarn": true },
+      { "mode": "Couponcode", "value": 0, "excludeLoyaltyEarn": false }
+    ],
+    "offerCodes": ["BILLOFFER100RS"],
+    "billAmount": 1800.0,
+    "billNetAmount": 1630.0,
+    "storeCode": "IMP",
+    "customerMobile": "{{mobile}}",
+    "customerEmail": "again.me@email.com",
+    "customerName": "abc",
+    "billTaxAmount": 404.84,
+    "campaignInfo": { "campaignId": "campaingid" },
+    "billLevelWastageAmount": 1,
+    "billLevelMakingCharges": 2,
+    "billLevelOtherCharges": 3,
+    "billLevelTotalCharges": 4
   }
-];
+]
+
+/**
+ * ALL 5 TEST CASES
+ */
+export const testCases: TestCase[] = [
+  "9000000001",
+  "9000000002",
+  "8838530066",
+  "9876543210",
+  "9123456789"
+].map((mobile, index) => ({
+  id: `TC_00${index + 1}`,
+  mobile,
+
+  postPayload: [{
+    ...baseBillPayload,
+    transactionId: `TXN-${Date.now()}-${index + 1}`,
+    billId: `BILL-${index + 1}`,
+    customerMobile: mobile
+
+    // ...temp,
+    // customerMobile: mobile
+  }],
+
+  getParams: {
+    mobile
+  }
+}));
+
+// export const testCases = [
+// [
+//   {
+//     "invoiceType": "IN",
+//     "billType": "Retail",
+//     "channel": "POS",
+//     "billDate": "2025-09-20T12:37:04.967Z",
+//     "billLevelOfferDiscount": 30,
+//     "billLevelProductDiscount": 100,
+//     "billLevelFooterDiscount": 10,
+//     "billLevelLoyaltyDiscount": 30,
+//     "totalDiscountAmount": 170,
+//     "transactionId": "{{billTransactionId}}",
+//     "billId": "ID_02_new4",
+//     "orderId": "ECOM_ID_01",
+//     "shipmentId": "ECOM_SHIPMENT_ID_01",
+//     "orderStatus": "INVOICED",
+//     "orderStatusCreationDateTime": "2023-11-06T16:15:15",
+//     "orderItems": [
+//       {
+//         "total": 1200,
+//         "netAmount": 1110,
+//         "quantity": 2,
+//         "price": 1200,
+//         "IGSTAmt": 0,
+//         "CGSTAmt": 101.21,
+//         "SGSTAmt": 101.21,
+//         "CESSAmt": 0,
+//         "CGSTRate": 6,
+//         "SGSTRate": 6,
+//         "IGSTRate": 0,
+//         "CESSRate": 0,
+//         "offerCodes": ["PRODUCTOFFER10PER"],
+//         "loyaltyDiscount": 20,
+//         "billDiscount": 20,
+//         "productDiscount": 50,
+//         "mrp": 1500,
+//         "skuCode": "S2474367",
+//         "orderInfo": { "status": "INVOICED", "createdAt": "2023-11-06T16:15:15" },
+//         "wastageAmount": 1,
+//         "makingCharges": 2,
+//         "otherCharges": 3,
+//         "totalCharges": 4,
+//         "weight": 5,
+//         "salesPerson": "John Doe",
+//         "posProductInfo": { "price": 600, "mrp": 600 }
+//       },
+//       {
+//         "total": 600,
+//         "netAmount": 580,
+//         "quantity": 2,
+//         "price": 600,
+//         "IGSTAmt": 0,
+//         "CGSTAmt": 54.21,
+//         "SGSTAmt": 54.21,
+//         "CESSAmt": 0,
+//         "CGSTRate": 9,
+//         "IGSTRate": 0,
+//         "SGSTRate": 9,
+//         "CESSRate": 0,
+//         "loyaltyDiscount": 10,
+//         "billDiscount": 10,
+//         "productDiscount": 0,
+//         "mrp": 800,
+//         "skuCode": "S2474368",
+//         "orderInfo": { "status": "INVOICED", "createdAt": "2023-11-06T16:15:15" },
+//         "wastageAmount": 0,
+//         "makingCharges": 0,
+//         "otherCharges": 0,
+//         "totalCharges": 0,
+//         "salesPerson": "John Doe",
+//         "posProductInfo": { "price": 300, "mrp": 300 }
+//       }
+//     ],
+//     "paymentSplits": [
+//       { "mode": "RED", "value": 0, "name": "Redemption Token", "shortcode": "RED", "excludeLoyaltyEarn": false },
+//       { "mode": "VCH", "value": 1520, "name": "Digital Money", "shortcode": "DIGIM", "excludeLoyaltyEarn": false },
+//       { "mode": "loyalty", "value": 0, "excludeLoyaltyEarn": true },
+//       { "mode": "Couponcode", "value": 0, "excludeLoyaltyEarn": false }
+//     ],
+//     "offerCodes": ["BILLOFFER100RS"],
+//     "billAmount": 1800.0,
+//     "billNetAmount": 1630.0,
+//     "storeCode": "IMP",
+//     "customerMobile": "{{mobile}}",
+//     "customerEmail": "again.me@email.com",
+//     "customerName": "abc",
+//     "billTaxAmount": 404.84,
+//     "campaignInfo": { "campaignId": "campaingid" },
+//     "billLevelWastageAmount": 1,
+//     "billLevelMakingCharges": 2,
+//     "billLevelOtherCharges": 3,
+//     "billLevelTotalCharges": 4
+//   }
+// ],
+// [
+//   {
+//     "invoiceType": "IN",
+//     "billType": "Retail",
+//     "channel": "POS",
+//     "billDate": "2025-09-20T12:37:04.967Z",
+//     "billLevelOfferDiscount": 30,
+//     "billLevelProductDiscount": 100,
+//     "billLevelFooterDiscount": 10,
+//     "billLevelLoyaltyDiscount": 30,
+//     "totalDiscountAmount": 170,
+//     "transactionId": "{{billTransactionId}}",
+//     "billId": "ID_02_new4",
+//     "orderId": "ECOM_ID_01",
+//     "shipmentId": "ECOM_SHIPMENT_ID_01",
+//     "orderStatus": "INVOICED",
+//     "orderStatusCreationDateTime": "2023-11-06T16:15:15",
+//     "orderItems": [
+//       {
+//         "total": 1200,
+//         "netAmount": 1110,
+//         "quantity": 2,
+//         "price": 1200,
+//         "IGSTAmt": 0,
+//         "CGSTAmt": 101.21,
+//         "SGSTAmt": 101.21,
+//         "CESSAmt": 0,
+//         "CGSTRate": 6,
+//         "SGSTRate": 6,
+//         "IGSTRate": 0,
+//         "CESSRate": 0,
+//         "offerCodes": ["PRODUCTOFFER10PER"],
+//         "loyaltyDiscount": 20,
+//         "billDiscount": 20,
+//         "productDiscount": 50,
+//         "mrp": 1500,
+//         "skuCode": "S2474367",
+//         "orderInfo": { "status": "INVOICED", "createdAt": "2023-11-06T16:15:15" },
+//         "wastageAmount": 1,
+//         "makingCharges": 2,
+//         "otherCharges": 3,
+//         "totalCharges": 4,
+//         "weight": 5,
+//         "salesPerson": "John Doe",
+//         "posProductInfo": { "price": 600, "mrp": 600 }
+//       },
+//       {
+//         "total": 600,
+//         "netAmount": 580,
+//         "quantity": 2,
+//         "price": 600,
+//         "IGSTAmt": 0,
+//         "CGSTAmt": 54.21,
+//         "SGSTAmt": 54.21,
+//         "CESSAmt": 0,
+//         "CGSTRate": 9,
+//         "IGSTRate": 0,
+//         "SGSTRate": 9,
+//         "CESSRate": 0,
+//         "loyaltyDiscount": 10,
+//         "billDiscount": 10,
+//         "productDiscount": 0,
+//         "mrp": 800,
+//         "skuCode": "S2474368",
+//         "orderInfo": { "status": "INVOICED", "createdAt": "2023-11-06T16:15:15" },
+//         "wastageAmount": 0,
+//         "makingCharges": 0,
+//         "otherCharges": 0,
+//         "totalCharges": 0,
+//         "salesPerson": "John Doe",
+//         "posProductInfo": { "price": 300, "mrp": 300 }
+//       }
+//     ],
+//     "paymentSplits": [
+//       { "mode": "RED", "value": 0, "name": "Redemption Token", "shortcode": "RED", "excludeLoyaltyEarn": false },
+//       { "mode": "VCH", "value": 1520, "name": "Digital Money", "shortcode": "DIGIM", "excludeLoyaltyEarn": false },
+//       { "mode": "loyalty", "value": 0, "excludeLoyaltyEarn": true },
+//       { "mode": "Couponcode", "value": 0, "excludeLoyaltyEarn": false }
+//     ],
+//     "offerCodes": ["BILLOFFER100RS"],
+//     "billAmount": 1800.0,
+//     "billNetAmount": 1630.0,
+//     "storeCode": "IMP",
+//     "customerMobile": "{{mobile}}",
+//     "customerEmail": "again.me@email.com",
+//     "customerName": "abc",
+//     "billTaxAmount": 404.84,
+//     "campaignInfo": { "campaignId": "campaingid" },
+//     "billLevelWastageAmount": 1,
+//     "billLevelMakingCharges": 2,
+//     "billLevelOtherCharges": 3,
+//     "billLevelTotalCharges": 4
+//   }
+// ],
+// [
+//   {
+//     "invoiceType": "IN",
+//     "billType": "Retail",
+//     "channel": "POS",
+//     "billDate": "2025-09-20T12:37:04.967Z",
+//     "billLevelOfferDiscount": 30,
+//     "billLevelProductDiscount": 100,
+//     "billLevelFooterDiscount": 10,
+//     "billLevelLoyaltyDiscount": 30,
+//     "totalDiscountAmount": 170,
+//     "transactionId": "{{billTransactionId}}",
+//     "billId": "ID_02_new4",
+//     "orderId": "ECOM_ID_01",
+//     "shipmentId": "ECOM_SHIPMENT_ID_01",
+//     "orderStatus": "INVOICED",
+//     "orderStatusCreationDateTime": "2023-11-06T16:15:15",
+//     "orderItems": [
+//       {
+//         "total": 1200,
+//         "netAmount": 1110,
+//         "quantity": 2,
+//         "price": 1200,
+//         "IGSTAmt": 0,
+//         "CGSTAmt": 101.21,
+//         "SGSTAmt": 101.21,
+//         "CESSAmt": 0,
+//         "CGSTRate": 6,
+//         "SGSTRate": 6,
+//         "IGSTRate": 0,
+//         "CESSRate": 0,
+//         "offerCodes": ["PRODUCTOFFER10PER"],
+//         "loyaltyDiscount": 20,
+//         "billDiscount": 20,
+//         "productDiscount": 50,
+//         "mrp": 1500,
+//         "skuCode": "S2474367",
+//         "orderInfo": { "status": "INVOICED", "createdAt": "2023-11-06T16:15:15" },
+//         "wastageAmount": 1,
+//         "makingCharges": 2,
+//         "otherCharges": 3,
+//         "totalCharges": 4,
+//         "weight": 5,
+//         "salesPerson": "John Doe",
+//         "posProductInfo": { "price": 600, "mrp": 600 }
+//       },
+//       {
+//         "total": 600,
+//         "netAmount": 580,
+//         "quantity": 2,
+//         "price": 600,
+//         "IGSTAmt": 0,
+//         "CGSTAmt": 54.21,
+//         "SGSTAmt": 54.21,
+//         "CESSAmt": 0,
+//         "CGSTRate": 9,
+//         "IGSTRate": 0,
+//         "SGSTRate": 9,
+//         "CESSRate": 0,
+//         "loyaltyDiscount": 10,
+//         "billDiscount": 10,
+//         "productDiscount": 0,
+//         "mrp": 800,
+//         "skuCode": "S2474368",
+//         "orderInfo": { "status": "INVOICED", "createdAt": "2023-11-06T16:15:15" },
+//         "wastageAmount": 0,
+//         "makingCharges": 0,
+//         "otherCharges": 0,
+//         "totalCharges": 0,
+//         "salesPerson": "John Doe",
+//         "posProductInfo": { "price": 300, "mrp": 300 }
+//       }
+//     ],
+//     "paymentSplits": [
+//       { "mode": "RED", "value": 0, "name": "Redemption Token", "shortcode": "RED", "excludeLoyaltyEarn": false },
+//       { "mode": "VCH", "value": 1520, "name": "Digital Money", "shortcode": "DIGIM", "excludeLoyaltyEarn": false },
+//       { "mode": "loyalty", "value": 0, "excludeLoyaltyEarn": true },
+//       { "mode": "Couponcode", "value": 0, "excludeLoyaltyEarn": false }
+//     ],
+//     "offerCodes": ["BILLOFFER100RS"],
+//     "billAmount": 1800.0,
+//     "billNetAmount": 1630.0,
+//     "storeCode": "IMP",
+//     "customerMobile": "{{mobile}}",
+//     "customerEmail": "again.me@email.com",
+//     "customerName": "abc",
+//     "billTaxAmount": 404.84,
+//     "campaignInfo": { "campaignId": "campaingid" },
+//     "billLevelWastageAmount": 1,
+//     "billLevelMakingCharges": 2,
+//     "billLevelOtherCharges": 3,
+//     "billLevelTotalCharges": 4
+//   }
+// ],
+// [
+//   {
+//     "invoiceType": "IN",
+//     "billType": "Retail",
+//     "channel": "POS",
+//     "billDate": "2025-09-20T12:37:04.967Z",
+//     "billLevelOfferDiscount": 30,
+//     "billLevelProductDiscount": 100,
+//     "billLevelFooterDiscount": 10,
+//     "billLevelLoyaltyDiscount": 30,
+//     "totalDiscountAmount": 170,
+//     "transactionId": "{{billTransactionId}}",
+//     "billId": "ID_02_new4",
+//     "orderId": "ECOM_ID_01",
+//     "shipmentId": "ECOM_SHIPMENT_ID_01",
+//     "orderStatus": "INVOICED",
+//     "orderStatusCreationDateTime": "2023-11-06T16:15:15",
+//     "orderItems": [
+//       {
+//         "total": 1200,
+//         "netAmount": 1110,
+//         "quantity": 2,
+//         "price": 1200,
+//         "IGSTAmt": 0,
+//         "CGSTAmt": 101.21,
+//         "SGSTAmt": 101.21,
+//         "CESSAmt": 0,
+//         "CGSTRate": 6,
+//         "SGSTRate": 6,
+//         "IGSTRate": 0,
+//         "CESSRate": 0,
+//         "offerCodes": ["PRODUCTOFFER10PER"],
+//         "loyaltyDiscount": 20,
+//         "billDiscount": 20,
+//         "productDiscount": 50,
+//         "mrp": 1500,
+//         "skuCode": "S2474367",
+//         "orderInfo": { "status": "INVOICED", "createdAt": "2023-11-06T16:15:15" },
+//         "wastageAmount": 1,
+//         "makingCharges": 2,
+//         "otherCharges": 3,
+//         "totalCharges": 4,
+//         "weight": 5,
+//         "salesPerson": "John Doe",
+//         "posProductInfo": { "price": 600, "mrp": 600 }
+//       },
+//       {
+//         "total": 600,
+//         "netAmount": 580,
+//         "quantity": 2,
+//         "price": 600,
+//         "IGSTAmt": 0,
+//         "CGSTAmt": 54.21,
+//         "SGSTAmt": 54.21,
+//         "CESSAmt": 0,
+//         "CGSTRate": 9,
+//         "IGSTRate": 0,
+//         "SGSTRate": 9,
+//         "CESSRate": 0,
+//         "loyaltyDiscount": 10,
+//         "billDiscount": 10,
+//         "productDiscount": 0,
+//         "mrp": 800,
+//         "skuCode": "S2474368",
+//         "orderInfo": { "status": "INVOICED", "createdAt": "2023-11-06T16:15:15" },
+//         "wastageAmount": 0,
+//         "makingCharges": 0,
+//         "otherCharges": 0,
+//         "totalCharges": 0,
+//         "salesPerson": "John Doe",
+//         "posProductInfo": { "price": 300, "mrp": 300 }
+//       }
+//     ],
+//     "paymentSplits": [
+//       { "mode": "RED", "value": 0, "name": "Redemption Token", "shortcode": "RED", "excludeLoyaltyEarn": false },
+//       { "mode": "VCH", "value": 1520, "name": "Digital Money", "shortcode": "DIGIM", "excludeLoyaltyEarn": false },
+//       { "mode": "loyalty", "value": 0, "excludeLoyaltyEarn": true },
+//       { "mode": "Couponcode", "value": 0, "excludeLoyaltyEarn": false }
+//     ],
+//     "offerCodes": ["BILLOFFER100RS"],
+//     "billAmount": 1800.0,
+//     "billNetAmount": 1630.0,
+//     "storeCode": "IMP",
+//     "customerMobile": "{{mobile}}",
+//     "customerEmail": "again.me@email.com",
+//     "customerName": "abc",
+//     "billTaxAmount": 404.84,
+//     "campaignInfo": { "campaignId": "campaingid" },
+//     "billLevelWastageAmount": 1,
+//     "billLevelMakingCharges": 2,
+//     "billLevelOtherCharges": 3,
+//     "billLevelTotalCharges": 4
+//   }
+// ],
+// [
+//   {
+//     "invoiceType": "IN",
+//     "billType": "Retail",
+//     "channel": "POS",
+//     "billDate": "2025-09-20T12:37:04.967Z",
+//     "billLevelOfferDiscount": 30,
+//     "billLevelProductDiscount": 100,
+//     "billLevelFooterDiscount": 10,
+//     "billLevelLoyaltyDiscount": 30,
+//     "totalDiscountAmount": 170,
+//     "transactionId": "{{billTransactionId}}",
+//     "billId": "ID_02_new4",
+//     "orderId": "ECOM_ID_01",
+//     "shipmentId": "ECOM_SHIPMENT_ID_01",
+//     "orderStatus": "INVOICED",
+//     "orderStatusCreationDateTime": "2023-11-06T16:15:15",
+//     "orderItems": [
+//       {
+//         "total": 1200,
+//         "netAmount": 1110,
+//         "quantity": 2,
+//         "price": 1200,
+//         "IGSTAmt": 0,
+//         "CGSTAmt": 101.21,
+//         "SGSTAmt": 101.21,
+//         "CESSAmt": 0,
+//         "CGSTRate": 6,
+//         "SGSTRate": 6,
+//         "IGSTRate": 0,
+//         "CESSRate": 0,
+//         "offerCodes": ["PRODUCTOFFER10PER"],
+//         "loyaltyDiscount": 20,
+//         "billDiscount": 20,
+//         "productDiscount": 50,
+//         "mrp": 1500,
+//         "skuCode": "S2474367",
+//         "orderInfo": { "status": "INVOICED", "createdAt": "2023-11-06T16:15:15" },
+//         "wastageAmount": 1,
+//         "makingCharges": 2,
+//         "otherCharges": 3,
+//         "totalCharges": 4,
+//         "weight": 5,
+//         "salesPerson": "John Doe",
+//         "posProductInfo": { "price": 600, "mrp": 600 }
+//       },
+//       {
+//         "total": 600,
+//         "netAmount": 580,
+//         "quantity": 2,
+//         "price": 600,
+//         "IGSTAmt": 0,
+//         "CGSTAmt": 54.21,
+//         "SGSTAmt": 54.21,
+//         "CESSAmt": 0,
+//         "CGSTRate": 9,
+//         "IGSTRate": 0,
+//         "SGSTRate": 9,
+//         "CESSRate": 0,
+//         "loyaltyDiscount": 10,
+//         "billDiscount": 10,
+//         "productDiscount": 0,
+//         "mrp": 800,
+//         "skuCode": "S2474368",
+//         "orderInfo": { "status": "INVOICED", "createdAt": "2023-11-06T16:15:15" },
+//         "wastageAmount": 0,
+//         "makingCharges": 0,
+//         "otherCharges": 0,
+//         "totalCharges": 0,
+//         "salesPerson": "John Doe",
+//         "posProductInfo": { "price": 300, "mrp": 300 }
+//       }
+//     ],
+//     "paymentSplits": [
+//       { "mode": "RED", "value": 0, "name": "Redemption Token", "shortcode": "RED", "excludeLoyaltyEarn": false },
+//       { "mode": "VCH", "value": 1520, "name": "Digital Money", "shortcode": "DIGIM", "excludeLoyaltyEarn": false },
+//       { "mode": "loyalty", "value": 0, "excludeLoyaltyEarn": true },
+//       { "mode": "Couponcode", "value": 0, "excludeLoyaltyEarn": false }
+//     ],
+//     "offerCodes": ["BILLOFFER100RS"],
+//     "billAmount": 1800.0,
+//     "billNetAmount": 1630.0,
+//     "storeCode": "IMP",
+//     "customerMobile": "{{mobile}}",
+//     "customerEmail": "again.me@email.com",
+//     "customerName": "abc",
+//     "billTaxAmount": 404.84,
+//     "campaignInfo": { "campaignId": "campaingid" },
+//     "billLevelWastageAmount": 1,
+//     "billLevelMakingCharges": 2,
+//     "billLevelOtherCharges": 3,
+//     "billLevelTotalCharges": 4
+//   }
+// ]
+// ]

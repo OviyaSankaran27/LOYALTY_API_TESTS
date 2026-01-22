@@ -1,49 +1,63 @@
-import * as billService from "../apis/billService";
-import { testScenarios } from "./data";
+import axios from "axios";
+import { testCases } from "./data";
+import api from "../config/axios";
 
 async function runTests() {
-  console.log("=========================================");
-  console.log("SYSTEM_LOG: TEST SUITE STARTED");
-  console.log("=========================================");
+  console.log("Starting Test Execution...\n");
 
-  for (const scenario of testScenarios) {
-    console.log(`SCENARIO: ${scenario.id} - ${scenario.description}`);
+  for (const tc of testCases) {
+    console.log("\n==============================");
+    console.log(`Executing ${tc.id}`);
+    console.log("==============================");
 
-    for (const testCase of scenario.cases) {
-      try {
-        console.log(`ACTION: ${testCase.action}`);
+    // -------- POST /bills --------
+    try {
+      console.log(`Sending POST /bills for ${tc.id}`);
 
-        if (testCase.action === "pushBill") {
-          console.log(
-            "REQUEST PAYLOAD:\n",
-            JSON.stringify(testCase.data, null, 2)
-          );
+      const postResponse = await api.post("/bills", tc.postPayload);
 
-          const response: any = await billService.pushBill(testCase.data);
+      console.log(`${tc.id} POST SUCCESS`);
+      console.log("Response:", postResponse.data);
+    } catch (err: any) {
+      console.error(`${tc.id} POST FAILED`);
+      console.error("Status:", err?.response?.status);
+      console.error("Error:", err?.response?.data);
+      continue; //  Skip GET if POST fails
+    }
 
-          if (
-            response?.success
-            // || JSON.stringify(response).toLowerCase().includes("success")
-          ) {
-            console.log("STATUS: pushBill SUCCESS");
-            console.log(response);
-            console.log(response.data)
-          } else {
-            console.error(" STATUS: pushBill FAILED");
-            console.error(response);
+    // -------- WAIT (sync delay) --------
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // -------- GET /v2/customers --------
+    try {
+      console.log(`Sending GET /v2/customers for ${tc.id}`);
+
+      const getResponse = await axios.get(
+        "https://api.casaqa.ajira.tech/v2/customers",
+        {
+          params: {
+            mobile: tc.getParams.mobile   //  THIS IS THE FIX
+          },
+          headers: {
+            "Content-Type": "application/json",
+            "api-key": "U0vwhQOnFz"
           }
         }
-      } catch (error: any) {
-        console.error(" TEST FAILED");
-        console.error(error?.response?.data || error.message || error);
-        return;
-      }
+      );
+
+      console.log(`${tc.id} GET SUCCESS`);
+      console.log("Response:", getResponse.data);
+    } catch (err: any) {
+      console.error(`${tc.id} GET FAILED`);
+      console.error("Status:", err?.response?.status);
+      console.error("Error:", err?.response?.data);
     }
   }
 
-  console.log("=========================================");
-  console.log("SYSTEM_LOG: TEST SUITE FINISHED");
-  console.log("=========================================");
+  console.log("\nAll test cases executed.");
 }
 
-runTests();
+// -------- RUN --------
+runTests().catch((err) => {
+  console.error("Unexpected error:", err);
+});

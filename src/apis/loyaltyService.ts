@@ -1,11 +1,9 @@
-import api from "../config/axios";
+import axiosInstance from "../config/axios";
 
-export const validateRedeem = async (data: any) => {
-  const response = await api.post("/redemption/validate", data);
-  return response.data;
-};
-
-export const blockRedeem = async (data: any) => {
-  const response = await api.post("/redemption/block", data);
-  return response.data;
-};
+export async function getLoyalty(mobile: string) {
+  try{
+  return axiosInstance.get(`/loyalty`, { params: { mobile } });
+  }catch(err: any){
+    console.log('AXIOS ERROR: ', err)
+  }
+}
