@@ -1,4 +1,3 @@
-import axios from "axios";
 import { testCases } from "./data";
 import api from "../config/axios";
 
@@ -22,28 +21,21 @@ async function runTests() {
       console.error(`${tc.id} POST FAILED`);
       console.error("Status:", err?.response?.status);
       console.error("Error:", err?.response?.data);
-      continue; //  Skip GET if POST fails
+      continue; // Skip GET if POST fails
     }
 
-    // -------- WAIT (sync delay) --------
+    // -------- WAIT --------
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // -------- GET /v2/customers --------
     try {
       console.log(`Sending GET /v2/customers for ${tc.id}`);
 
-      const getResponse = await axios.get(
-        "https://api.casaqa.ajira.tech/v2/customers",
-        {
-          params: {
-            mobile: tc.getParams.mobile   //  THIS IS THE FIX
-          },
-          headers: {
-            "Content-Type": "application/json",
-            "api-key": "U0vwhQOnFz"
-          }
+      const getResponse = await api.get("/v2/customers", {
+        params: {
+          mobile: tc.getParams.mobile
         }
-      );
+      });
 
       console.log(`${tc.id} GET SUCCESS`);
       console.log("Response:", getResponse.data);
