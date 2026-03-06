@@ -15,7 +15,7 @@ async function runTests() {
 
       console.log(`Sending POST /v2/bills for ${tc.id}`);
 
-      const postResponse = await api.post("/v2/bills", tc.payload);
+      const postResponse = await api.post("/bills", tc.postPayload);
 
       console.log(`${tc.id} POST SUCCESS`);
       console.log("Response:", postResponse.data);
@@ -35,12 +35,10 @@ async function runTests() {
     // -------- GET CUSTOMER --------
     try {
 
-      console.log(`Checking Customer ${tc.customerMobile}`);
+      console.log(`Checking Customer ${tc.getParams.mobile}`);
 
-      const getResponse = await api.get("customers", {
-        params: {
-          mobile: tc.customerMobile
-        }
+      const getResponse = await api.get("/customers", {
+        params: tc.getParams
       });
 
       console.log(`${tc.id} GET SUCCESS`);
